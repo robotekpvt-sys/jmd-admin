@@ -5,107 +5,410 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JMD Boot House - Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
-        :root{--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#666;--border:#e8e8e8;--input:#f5f5f7}
-        body.dark-mode{--bg:#0a0a1a;--card:#1a1a3e;--text:#f0f0f0;--text2:#aaa;--border:#2a2a4e;--input:#1a1a3e}
-        body{background:var(--bg);color:var(--text)}
 
-        .login-box{max-width:400px;margin:80px auto;padding:40px;background:var(--card);border-radius:28px;border:1px solid var(--border)}
-        .login-box h2{margin-bottom:20px}
-        .login-box input{width:100%;padding:14px;border:2px solid var(--border);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input);color:var(--text)}
-        .login-box button{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,#ff3f6c,#ff6b8a);color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+        :root {
+            --primary: #ff3f6c;
+            --primary-dark: #e6355e;
+            --secondary: #1a1a2e;
+            --whatsapp: #25D366;
+            --whatsapp-dark: #128C7E;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #111111;
+            --text2: #666666;
+            --text3: #999999;
+            --border: #e8e8e8;
+            --shadow: 0 2px 20px rgba(0,0,0,0.06);
+            --shadow-hover: 0 8px 40px rgba(0,0,0,0.12);
+            --radius: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        .admin-header{padding:16px 24px;background:var(--card);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
-        .admin-header h1{font-size:20px}
-        .admin-header .j{color:#ff3f6c}.admin-header .b{color:#ff6b00}
-        .admin-header .logout{background:none;border:none;color:#ff3f6c;font-weight:600;cursor:pointer;font-size:14px}
+        body.dark-mode {
+            --bg: #0a0a1a;
+            --card: #12122a;
+            --text: #f0f0f0;
+            --text2: #aaaaaa;
+            --text3: #666666;
+            --border: #2a2a4e;
+            --shadow: 0 2px 20px rgba(255,255,255,0.03);
+            --shadow-hover: 0 8px 40px rgba(255,255,255,0.05);
+        }
 
-        .admin-body{padding:20px 24px}
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
-        .stat{background:var(--card);padding:16px 20px;border-radius:16px;border:1px solid var(--border)}
-        .stat .num{font-size:28px;font-weight:800}
-        .stat .lbl{font-size:12px;color:var(--text2)}
+        body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif}
 
-        .tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
-        .tabs button{padding:8px 20px;border:none;border-radius:10px;background:var(--input);font-weight:600;font-size:12px;cursor:pointer;color:var(--text2)}
-        .tabs button.active{background:var(--card);color:#ff3f6c;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:linear-gradient(135deg,#ff3f6c,#ff6b8a);border-radius:10px}
 
-        .table-wrap{overflow-x:auto}
-        table{width:100%;font-size:12px;border-collapse:collapse}
-        th{text-align:left;padding:10px 14px;background:var(--input);font-weight:600;color:var(--text2)}
-        td{padding:10px 14px;border-bottom:1px solid var(--border)}
-        .status-badge{padding:4px 14px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block}
+        /* ===== LOGIN ===== */
+        .login-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:20px}
+        .login-box{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);padding:50px 40px;border-radius:var(--radius-lg);width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        .login-box .logo{text-align:center;font-size:32px;font-weight:900;margin-bottom:8px;color:#fff}
+        .login-box .logo .j{color:#ff3f6c}
+        .login-box .logo .b{color:#ff6b00}
+        .login-box .sub{text-align:center;color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:30px}
+        .login-box label{color:rgba(255,255,255,0.7);font-size:13px;font-weight:500}
+        .login-box input{width:100%;padding:14px 18px;border:2px solid rgba(255,255,255,0.1);border-radius:12px;background:rgba(255,255,255,0.05);color:#fff;font-size:14px;margin:4px 0 16px;transition:var(--transition)}
+        .login-box input:focus{outline:none;border-color:#ff3f6c;background:rgba(255,255,255,0.08)}
+        .login-box input::placeholder{color:rgba(255,255,255,0.3)}
+        .login-box .btn-login{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(135deg,#ff3f6c,#ff6b8a);color:#fff;font-weight:700;font-size:16px;cursor:pointer;transition:var(--transition);margin-top:8px}
+        .login-box .btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,63,108,0.3)}
+        .login-box .footer-text{text-align:center;color:rgba(255,255,255,0.4);font-size:12px;margin-top:16px}
+
+        /* ===== ADMIN LAYOUT ===== */
+        .admin-wrapper{display:flex;min-height:100vh}
+
+        /* ===== SIDEBAR ===== */
+        .sidebar{width:270px;background:var(--secondary);min-height:100vh;position:fixed;top:0;left:0;bottom:0;z-index:1000;transition:transform 0.3s ease;overflow-y:auto}
+        .sidebar-brand{padding:28px 24px;border-bottom:1px solid rgba(255,255,255,0.06)}
+        .sidebar-brand .logo{font-size:26px;font-weight:900;color:#fff}
+        .sidebar-brand .logo .j{color:#ff3f6c}
+        .sidebar-brand .logo .b{color:#ff6b00}
+        .sidebar-brand .sub{color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:2px;margin-top:2px}
+        .sidebar-menu{padding:16px 12px}
+        .sidebar-item{padding:12px 18px;display:flex;align-items:center;gap:14px;border-radius:12px;cursor:pointer;transition:var(--transition);color:rgba(255,255,255,0.6);text-decoration:none;margin-bottom:4px;font-weight:500;font-size:14px}
+        .sidebar-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+        .sidebar-item.active{background:rgba(255,63,108,0.15);color:#ff3f6c}
+        .sidebar-item .icon{font-size:20px;width:24px;text-align:center}
+        .sidebar-item .badge{margin-left:auto;background:#ff3f6c;color:#fff;font-size:10px;padding:2px 10px;border-radius:20px;font-weight:600}
+        .sidebar-item .badge.whatsapp{background:#25D366}
+
+        /* ===== MAIN ===== */
+        .main{padding-top: 0; margin-left:270px;flex:1;padding:24px 30px 100px}
+
+        /* ===== HEADER ===== */
+        .top-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+        .top-header .title{font-size:24px;font-weight:700;display:flex;align-items:center;gap:12px}
+        .top-header .title .hamburger{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text)}
+        .top-header .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+        .top-header .actions .btn{background:var(--input);border:none;padding:8px 16px;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px;transition:var(--transition)}
+        .top-header .actions .btn:hover{background:var(--border)}
+        .top-header .actions .btn-primary{background:linear-gradient(135deg,#ff3f6c,#ff6b8a);color:#fff}
+        .top-header .actions .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,63,108,0.3)}
+
+        /* ===== WHATSAPP STATUS BAR ===== */
+        .whatsapp-bar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+        .whatsapp-bar .status{display:flex;align-items:center;gap:12px}
+        .whatsapp-bar .status .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+        .whatsapp-bar .status .dot.active{background:#25D366;animation:pulse 2s infinite}
+        .whatsapp-bar .status .dot.inactive{background:#ff4444}
+        @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}100%{opacity:1;transform:scale(1)}}
+        .whatsapp-bar .status .label{font-weight:600;font-size:14px}
+        .whatsapp-bar .status .sub{font-size:12px;color:var(--text2)}
+        .whatsapp-bar .actions{display:flex;gap:10px}
+        .btn-whatsapp{padding:10px 24px;border:none;border-radius:12px;background:#25D366;color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:8px}
+        .btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(37,211,102,0.3)}
+        .btn-whatsapp-outline{padding:10px 24px;border:2px solid #25D366;border-radius:12px;background:transparent;color:#25D366;font-weight:700;font-size:13px;cursor:pointer;transition:var(--transition)}
+        .btn-whatsapp-outline:hover{background:#25D366;color:#fff}
+
+        /* ===== STATS ===== */
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:30px}
+        .stat-card{background:var(--card);padding:20px 24px;border-radius:var(--radius);border:1px solid var(--border);transition:var(--transition)}
+        .stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+        .stat-card .icon{font-size:32px;margin-bottom:8px}
+        .stat-card .label{font-size:13px;color:var(--text2);font-weight:500}
+        .stat-card .value{font-size:28px;font-weight:800;margin-top:4px}
+        .stat-card .change{font-size:12px;font-weight:600;margin-top:4px}
+        .stat-card .change.up{color:#00b894}
+        .stat-card .change.down{color:#ff3f6c}
+
+        /* ===== TABLES ===== */
+        .table-wrap{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+        .table-header{padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+        .table-header h3{font-size:18px;font-weight:700}
+        .table-header .filters{display:flex;gap:10px;flex-wrap:wrap}
+        .table-search{padding:8px 16px;border:2px solid var(--border);border-radius:10px;background:var(--input);font-size:13px;color:var(--text);outline:none;transition:var(--transition)}
+        .table-search:focus{border-color:#ff3f6c;box-shadow:0 0 0 4px rgba(255,63,108,0.1)}
+        .table-scroll{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;font-size:13px}
+        th{text-align:left;padding:12px 18px;background:var(--input);font-weight:600;color:var(--text2);border-bottom:2px solid var(--border)}
+        td{padding:12px 18px;border-bottom:1px solid var(--border)}
+        tr:hover td{background:var(--input)}
+
+        .status-badge{padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
         .status-badge.processing{background:#ff3f6c20;color:#ff3f6c}
         .status-badge.shipped{background:#f59e0b20;color:#f59e0b}
         .status-badge.delivered{background:#00b89420;color:#00b894}
         .status-badge.cancelled{background:#ff444420;color:#ff4444}
+
         .status-select{padding:4px 10px;border-radius:8px;border:2px solid var(--border);background:var(--card);font-size:11px;font-weight:600;cursor:pointer;color:var(--text)}
-        .action-btn{padding:4px 12px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:11px}
+        .status-select:focus{outline:none;border-color:#ff3f6c}
+        .action-btn{padding:5px 12px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:11px;transition:var(--transition)}
         .action-btn.view{background:#ff3f6c20;color:#ff3f6c}
         .action-btn.view:hover{background:#ff3f6c;color:#fff}
+        .action-btn.whatsapp{background:#25D36620;color:#25D366}
+        .action-btn.whatsapp:hover{background:#25D366;color:#fff}
         .action-btn.del{background:#ff444420;color:#ff4444}
         .action-btn.del:hover{background:#ff4444;color:#fff}
 
-        .toast{position:fixed;bottom:30px;right:30px;background:var(--card);color:var(--text);padding:14px 28px;border-radius:16px;font-size:14px;font-weight:500;z-index:9999;display:none;box-shadow:0 10px 50px rgba(0,0,0,0.2);border:1px solid var(--border)}
+        /* ===== TABS ===== */
+        .tabs{display:flex;gap:4px;background:var(--input);padding:4px;border-radius:12px;margin-bottom:20px;flex-wrap:wrap}
+        .tab-btn{padding:10px 24px;border:none;border-radius:10px;background:transparent;font-weight:600;font-size:13px;cursor:pointer;transition:var(--transition);color:var(--text2)}
+        .tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 2px 10px var(--shadow)}
+        .tab-btn .count{background:var(--input);padding:0 8px;border-radius:10px;font-size:11px}
+        .tab-btn.active .count{background:#ff3f6c;color:#fff}
+
+        /* ===== WHATSAPP TAB ===== */
+        .whatsapp-settings{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:30px}
+        .whatsapp-settings .field{margin-bottom:20px}
+        .whatsapp-settings label{font-weight:600;font-size:13px;color:var(--text2);display:block;margin-bottom:4px}
+        .whatsapp-settings input,.whatsapp-settings textarea{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;background:var(--input);font-size:14px;color:var(--text);outline:none;transition:var(--transition)}
+        .whatsapp-settings input:focus,.whatsapp-settings textarea:focus{border-color:#ff3f6c;box-shadow:0 0 0 4px rgba(255,63,108,0.1)}
+        .whatsapp-settings textarea{resize:vertical;min-height:120px;font-family:monospace;font-size:13px}
+        .whatsapp-settings .template-preview{background:var(--input);padding:16px;border-radius:12px;border-left:4px solid #25D366;font-family:monospace;font-size:13px;white-space:pre-wrap;margin-top:8px}
+
+        /* ===== TOAST ===== */
+        .toast{position:fixed;bottom:30px;right:30px;background:var(--card);color:var(--text);padding:14px 28px;border-radius:16px;font-size:14px;font-weight:500;z-index:9999;display:none;box-shadow:0 10px 50px rgba(0,0,0,0.2);border:1px solid var(--border);max-width:400px;animation:slideUp 0.4s ease}
+        @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+        /* ===== MODAL ===== */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:5000;display:none;align-items:center;justify-content:center}
         .modal-overlay.show{display:flex}
-        .modal{background:var(--card);width:90%;max-width:500px;max-height:80vh;border-radius:28px;padding:30px;overflow-y:auto;border:1px solid var(--border)}
-        .modal-close{float:right;width:40px;height:40px;border-radius:50%;border:none;background:var(--input);font-size:22px;cursor:pointer}
-        .btn-secondary{width:100%;padding:14px;border:2px solid #ff3f6c;border-radius:14px;background:transparent;color:#ff3f6c;font-weight:600;cursor:pointer;margin-top:8px}
-        .refresh-btn{padding:6px 16px;border:none;border-radius:10px;background:var(--input);font-weight:600;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-        .refresh-btn:hover{background:var(--border)}
-        .spinning{animation:spin 1s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
+        .modal{background:var(--card);width:90%;max-width:550px;max-height:90vh;border-radius:var(--radius-lg);padding:30px;overflow-y:auto;border:1px solid var(--border);animation:modalSlide 0.4s cubic-bezier(0.4,0,0.2,1)}
+        @keyframes modalSlide{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+        .modal-close{float:right;width:40px;height:40px;border-radius:50%;border:none;background:var(--input);font-size:22px;cursor:pointer;color:var(--text);transition:var(--transition)}
+        .modal-close:hover{background:var(--border);transform:rotate(90deg)}
+
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999}
+        .sidebar-overlay.show{display:block}
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:768px){
+            .sidebar{transform:translateX(-100%);width:280px}
+            .sidebar.open{transform:translateX(0)}
+            .main{margin-left:0;padding:16px}
+            .top-header .title .hamburger{display:block}
+            .stats-grid{grid-template-columns:repeat(2,1fr)}
+            .whatsapp-bar{flex-direction:column;align-items:flex-start}
+            .whatsapp-bar .actions{width:100%}
+            .whatsapp-bar .actions button{flex:1;justify-content:center}
+        }
+        @media(max-width:480px){
+            .stats-grid{grid-template-columns:1fr}
+            .tabs{flex-wrap:wrap}
+            .tab-btn{flex:1;text-align:center;padding:8px 12px;font-size:11px}
+            .table-header{flex-direction:column;align-items:stretch}
+            .login-box{padding:30px 20px}
+            .top-header .actions .btn span{display:none}
+        }
     </style>
 </head>
 <body>
 
 <!-- ===== LOGIN ===== -->
-<div id="loginPage" class="login-box">
-    <h2>🔐 Admin Login</h2>
-    <label style="font-weight:600;font-size:13px;color:var(--text2)">Email</label>
-    <input type="email" id="loginEmail" value="admin@jmdboot.com">
-    <label style="font-weight:600;font-size:13px;color:var(--text2)">Password</label>
-    <input type="password" id="loginPassword" value="admin123">
-    <button onclick="adminLogin()">Sign In</button>
-    <p style="margin-top:12px;font-size:12px;color:var(--text2);text-align:center;">Default: admin@jmdboot.com / admin123</p>
+<div id="loginPage" class="login-wrapper">
+    <div class="login-box">
+        <div class="logo"><span class="j">JMD</span><span class="b">BOOT</span></div>
+        <div class="sub">✦ ADMIN PANEL ✦</div>
+        <label>📧 Email Address</label>
+        <input type="email" id="loginEmail" value="admin@jmdboot.com" placeholder="Enter your email">
+        <label>🔒 Password</label>
+        <input type="password" id="loginPassword" value="admin123" placeholder="Enter your password">
+        <button class="btn-login" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+        <div class="footer-text">Default: admin@jmdboot.com / admin123</div>
+    </div>
 </div>
 
 <!-- ===== ADMIN PANEL ===== -->
 <div id="adminPanel" style="display:none;">
-    <div class="admin-header">
-        <h1><span class="j">JMD</span><span class="b">BOOT</span> <span style="font-size:13px;font-weight:400;color:var(--text2)">Admin</span></h1>
-        <div>
-            <span style="font-size:12px;color:var(--text2);margin-right:12px;" id="lastUpdate">📡 Loading...</span>
-            <button class="refresh-btn" onclick="loadOrders()">🔄</button>
-            <button class="logout" onclick="adminLogout()">🚪 Logout</button>
+<div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo"><span class="j">JMD</span><span class="b">BOOT</span></div>
+            <div class="sub">✦ ADMIN PANEL ✦</div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item active" onclick="switchTab('dashboard')">
+                <span class="icon">📊</span> Dashboard
+            </div>
+            <div class="sidebar-item" onclick="switchTab('orders')">
+                <span class="icon">📦</span> Orders
+                <span class="badge" id="orderBadge">0</span>
+            </div>
+            <div class="sidebar-item" onclick="switchTab('whatsapp')">
+                <span class="icon">💬</span> WhatsApp
+                <span class="badge whatsapp" id="whatsappBadge">ON</span>
+            </div>
+            <div class="sidebar-item" onclick="switchTab('customers')">
+                <span class="icon">👤</span> Customers
+            </div>
+            <div class="sidebar-item" onclick="switchTab('settings')">
+                <span class="icon">⚙️</span> Settings
+            </div>
+            <div class="sidebar-item" onclick="adminLogout()" style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;color:rgba(255,255,255,0.4)">
+                <span class="icon">🚪</span> Logout
+            </div>
         </div>
     </div>
 
-    <div class="admin-body">
-        <div class="stats" id="stats">
-            <div class="stat"><div class="num" id="statOrders">0</div><div class="lbl">📦 Orders</div></div>
-            <div class="stat"><div class="num" id="statRevenue">₹0</div><div class="lbl">💰 Revenue</div></div>
-            <div class="stat"><div class="num" id="statCustomers">0</div><div class="lbl">👥 Customers</div></div>
-            <div class="stat"><div class="num" id="statPending">0</div><div class="lbl">⏳ Pending</div></div>
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <div class="main" id="mainContent">
+
+        <!-- HEADER -->
+        <div class="top-header">
+            <div class="title">
+                <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                <span id="pageTitle">Dashboard</span>
+            </div>
+            <div class="actions">
+                <span style="font-size:13px;color:var(--text2);"><i class="fas fa-user-circle"></i> Admin</span>
+                <button class="btn" onclick="loadOrders()"><i class="fas fa-sync-alt"></i> <span>Refresh</span></button>
+                <button class="btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+                <button class="btn btn-primary" onclick="window.open('index.html','_blank')"><i class="fas fa-store"></i> <span>Store</span></button>
+            </div>
         </div>
 
-        <div class="tabs" id="orderTabs">
-            <button class="active" onclick="filterOrders('all',this)">📦 All</button>
-            <button onclick="filterOrders('processing',this)">⏳ Processing</button>
-            <button onclick="filterOrders('shipped',this)">📤 Shipped</button>
-            <button onclick="filterOrders('delivered',this)">✅ Delivered</button>
-            <button onclick="filterOrders('cancelled',this)">❌ Cancelled</button>
+        <!-- WHATSAPP STATUS -->
+        <div class="whatsapp-bar" id="whatsappBar">
+            <div class="status">
+                <span class="dot active" id="whatsappDot"></span>
+                <div>
+                    <div class="label">💬 WhatsApp Notifications</div>
+                    <div class="sub" id="whatsappStatusText">Active — New orders will be sent to WhatsApp</div>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn-whatsapp" onclick="testWhatsApp()"><i class="fab fa-whatsapp"></i> Test</button>
+                <button class="btn-whatsapp-outline" onclick="toggleWhatsApp()" id="whatsappToggleBtn"><i class="fas fa-pause"></i> Pause</button>
+            </div>
         </div>
 
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Items</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody id="ordersTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">📦 Loading orders...</td></tr></tbody>
-            </table>
+        <!-- DASHBOARD -->
+        <div id="tabDashboard">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="icon">📦</div><div class="label">Total Orders</div><div class="value" id="statOrders">0</div><div class="change up">↑ 12% this month</div></div>
+                <div class="stat-card"><div class="icon">💰</div><div class="label">Revenue</div><div class="value" id="statRevenue">₹0</div><div class="change up">↑ 8% this month</div></div>
+                <div class="stat-card"><div class="icon">👥</div><div class="label">Customers</div><div class="value" id="statCustomers">0</div><div class="change up">↑ 5% this month</div></div>
+                <div class="stat-card"><div class="icon">💬</div><div class="label">WhatsApp Sent</div><div class="value" id="statWhatsApp">0</div><div class="change up">↑ 3% this month</div></div>
+            </div>
+            <div class="table-wrap">
+                <div class="table-header">
+                    <h3>📋 Recent Orders</h3>
+                    <button class="action-btn view" onclick="switchTab('orders')">View All →</button>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>WhatsApp</th><th>Date</th></tr></thead>
+                        <tbody id="recentOrders"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
+        <!-- ORDERS -->
+        <div id="tabOrders" style="display:none;">
+            <div class="tabs" id="orderTabs">
+                <button class="tab-btn active" onclick="filterOrders('all',this)">All <span class="count" id="countAll">0</span></button>
+                <button class="tab-btn" onclick="filterOrders('processing',this)">Processing <span class="count" id="countProcessing">0</span></button>
+                <button class="tab-btn" onclick="filterOrders('shipped',this)">Shipped <span class="count" id="countShipped">0</span></button>
+                <button class="tab-btn" onclick="filterOrders('delivered',this)">Delivered <span class="count" id="countDelivered">0</span></button>
+                <button class="tab-btn" onclick="filterOrders('cancelled',this)">Cancelled <span class="count" id="countCancelled">0</span></button>
+            </div>
+            <div class="table-wrap">
+                <div class="table-header">
+                    <h3>📦 All Orders</h3>
+                    <div class="filters">
+                        <input class="table-search" type="text" placeholder="🔍 Search orders..." oninput="searchOrders(this.value)">
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Items</th><th>Amount</th><th>Status</th><th>WhatsApp</th><th>Date</th><th>Action</th></tr></thead>
+                        <tbody id="ordersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- WHATSAPP -->
+        <div id="tabWhatsapp" style="display:none;">
+            <div class="whatsapp-settings">
+                <h3 style="margin-bottom:20px;">💬 WhatsApp Notification Settings</h3>
+                <div class="field">
+                    <label>📱 Admin WhatsApp Number</label>
+                    <input type="text" id="adminWhatsApp" value="+919999999999" placeholder="+91 9876543210">
+                    <small style="color:var(--text3);font-size:11px;">Include country code (e.g., +91 for India)</small>
+                </div>
+                <div class="field">
+                    <label>📝 Message Template</label>
+                    <textarea id="whatsappTemplate">🛍️ *New Order!*
+
+Order ID: {orderId}
+Customer: {customer}
+Phone: {phone}
+Total: ₹{total}
+
+Items:
+{items}
+
+Status: {status}
+
+📦 Thank you for shopping at JMD BOOT HOUSE!</textarea>
+                    <small style="color:var(--text3);font-size:11px;">Use {orderId}, {customer}, {phone}, {total}, {items}, {status}</small>
+                </div>
+                <div class="field">
+                    <label>📋 Preview</label>
+                    <div class="template-preview" id="templatePreview">🛍️ *New Order!*
+
+Order ID: ORD12345678
+Customer: John Doe
+Phone: +919999999999
+Total: ₹3,999
+
+Items:
+• Nike Air Max × 1 = ₹3,999
+
+Status: Processing
+
+📦 Thank you for shopping at JMD BOOT HOUSE!</div>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
+                    <button class="btn-whatsapp" onclick="saveWhatsAppSettings()"><i class="fas fa-save"></i> Save Settings</button>
+                    <button class="btn-whatsapp-outline" onclick="sendTestMessage()"><i class="fab fa-whatsapp"></i> Send Test</button>
+                </div>
+                <div style="margin-top:24px;padding:16px;background:var(--input);border-radius:12px;border-left:4px solid #25D366;">
+                    <h4 style="font-size:14px;">📋 Recent WhatsApp Logs</h4>
+                    <div id="whatsappLogs" style="margin-top:8px;font-size:12px;max-height:200px;overflow-y:auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div id="tabCustomers" style="display:none;">
+            <div class="table-wrap">
+                <div class="table-header"><h3>👤 Registered Customers</h3></div>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spent</th><th>Joined</th></tr></thead>
+                        <tbody id="customersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="tabSettings" style="display:none;">
+            <div class="whatsapp-settings">
+                <h3 style="margin-bottom:20px;">⚙️ Admin Settings</h3>
+                <div class="field"><label>Admin Email</label><input type="email" id="adminEmail" value="admin@jmdboot.com"></div>
+                <div class="field"><label>New Password</label><input type="password" id="adminPassword" placeholder="Enter new password"></div>
+                <button class="btn-whatsapp" onclick="saveAdminSettings()" style="background:linear-gradient(135deg,#ff3f6c,#ff6b8a);"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+        </div>
+
     </div>
+</div>
 </div>
 
 <!-- ===== TOAST ===== -->
@@ -136,18 +439,39 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ==========================================
-// ADMIN CREDENTIALS
-// ==========================================
-const ADMIN = {
-    email: 'admin@jmdboot.com',
-    password: 'admin123'
-};
-
-// ==========================================
 // STATE
 // ==========================================
 let orders = [];
 let filterStatus = 'all';
+let currentSearch = '';
+let whatsappLogs = [];
+let isWhatsAppActive = true;
+let currentTab = 'dashboard';
+
+// ==========================================
+// WHATSAPP CONFIG
+// ==========================================
+const WHATSAPP_CONFIG = {
+    adminNumber: '+919999999999',
+    template: `🛍️ *New Order!*
+
+Order ID: {orderId}
+Customer: {customer}
+Phone: {phone}
+Total: ₹{total}
+
+Items:
+{items}
+
+Status: {status}
+
+📦 Thank you for shopping at JMD BOOT HOUSE!`
+};
+
+// ==========================================
+// ADMIN CREDENTIALS
+// ==========================================
+const ADMIN = { email: 'admin@jmdboot.com', password: 'admin123' };
 
 // ==========================================
 // LOGIN / LOGOUT
@@ -160,6 +484,7 @@ function adminLogin() {
         document.getElementById('adminPanel').style.display = 'block';
         localStorage.setItem('admin_logged', 'true');
         loadOrders();
+        loadWhatsAppSettings();
         toast('✅ Welcome Admin!');
     } else {
         toast('❌ Invalid credentials!');
@@ -167,138 +492,77 @@ function adminLogin() {
 }
 
 function adminLogout() {
-    document.getElementById('loginPage').style.display = 'block';
+    document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('adminPanel').style.display = 'none';
     localStorage.removeItem('admin_logged');
-    if(window._firebaseListener) {
-        database.ref('orders').off();
-    }
+    if(window._firebaseListener) { database.ref('orders').off(); }
     toast('👋 Logged out');
 }
 
 // ==========================================
-// 🔥 LOAD ORDERS FROM FIREBASE + LOCAL
+// 🔥 LOAD ORDERS
 // ==========================================
 function loadOrders() {
-    const refreshBtn = document.querySelector('.refresh-btn');
-    refreshBtn.classList.add('spinning');
-    document.getElementById('lastUpdate').textContent = '📡 Loading...';
+    document.getElementById('lastUpdate')?.textContent = '📡 Loading...';
 
-    // 1. Pehle localStorage se load karo (immediate)
+    // LocalStorage first
     try {
-        const localOrders = localStorage.getItem('jmd_orders');
-        if (localOrders) {
-            const parsed = JSON.parse(localOrders);
-            if (parsed.length > 0) {
-                orders = parsed;
-                renderOrders();
-                updateStats();
-                console.log('✅ Loaded from localStorage:', orders.length);
-            }
-        }
-    } catch(e) {}
+        const local = localStorage.getItem('jmd_orders');
+        if(local) { orders = JSON.parse(local); renderOrders(); updateStats(); }
+    } catch(e){}
 
-    // 2. Firebase se fetch karo (live)
+    // Firebase
     database.ref('orders').once('value').then(snapshot => {
-        const firebaseOrders = [];
-        snapshot.forEach(child => {
-            firebaseOrders.push(child.val());
-        });
-
-        if (firebaseOrders.length > 0) {
-            orders = firebaseOrders;
+        const fbOrders = [];
+        snapshot.forEach(child => { fbOrders.push(child.val()); });
+        if(fbOrders.length > 0) {
+            orders = fbOrders;
             localStorage.setItem('jmd_orders', JSON.stringify(orders));
-            console.log('✅ Loaded from Firebase:', orders.length);
-        } else {
-            console.log('⚠️ No orders in Firebase, using local');
         }
-
-        renderOrders();
-        updateStats();
-        document.getElementById('lastUpdate').textContent = '✅ ' + new Date().toLocaleTimeString();
-        refreshBtn.classList.remove('spinning');
+        renderOrders(); updateStats(); updateBadges();
+        document.getElementById('lastUpdate')?.textContent = '✅ ' + new Date().toLocaleTimeString();
         toast('✅ Orders updated!');
     }).catch(err => {
         console.error('❌ Firebase error:', err);
-        document.getElementById('lastUpdate').textContent = '⚠️ Firebase error';
-        refreshBtn.classList.remove('spinning');
         toast('⚠️ Using local orders');
     });
 }
 
 // ==========================================
-// 🔥 LIVE LISTENING - Firebase se realtime orders
+// 🔥 FIREBASE LISTENER (LIVE)
 // ==========================================
 function startFirebaseListener() {
-    if (window._firebaseListener) return;
-
+    if(window._firebaseListener) return;
     database.ref('orders').on('value', snapshot => {
-        const firebaseOrders = [];
-        snapshot.forEach(child => {
-            firebaseOrders.push(child.val());
-        });
-
-        if (firebaseOrders.length > 0) {
-            orders = firebaseOrders;
+        const fbOrders = [];
+        snapshot.forEach(child => { fbOrders.push(child.val()); });
+        if(fbOrders.length > 0) {
+            orders = fbOrders;
             localStorage.setItem('jmd_orders', JSON.stringify(orders));
-            console.log('🔥 Live update from Firebase:', orders.length);
-            renderOrders();
-            updateStats();
-            document.getElementById('lastUpdate').textContent = '🔥 ' + new Date().toLocaleTimeString();
+            renderOrders(); updateStats(); updateBadges();
+            document.getElementById('lastUpdate')?.textContent = '🔥 ' + new Date().toLocaleTimeString();
         }
     });
-
     window._firebaseListener = true;
     console.log('🔥 Firebase listener started');
-}
-
-// ==========================================
-// SAVE ORDER TO FIREBASE
-// ==========================================
-function saveOrderToFirebase(order) {
-    try {
-        const orderId = order.id || 'ORD' + Date.now().toString().slice(-8);
-        database.ref('orders/' + orderId).set(order)
-            .then(() => {
-                console.log('✅ Order saved to Firebase:', orderId);
-                // Also save to localStorage
-                let localOrders = JSON.parse(localStorage.getItem('jmd_orders') || '[]');
-                // Remove duplicate if exists
-                localOrders = localOrders.filter(o => o.id !== orderId);
-                localOrders.unshift(order);
-                localStorage.setItem('jmd_orders', JSON.stringify(localOrders));
-                orders = localOrders;
-                renderOrders();
-                updateStats();
-            })
-            .catch(err => {
-                console.error('❌ Firebase save error:', err);
-                // Fallback to localStorage
-                let localOrders = JSON.parse(localStorage.getItem('jmd_orders') || '[]');
-                localOrders.unshift(order);
-                localStorage.setItem('jmd_orders', JSON.stringify(localOrders));
-                orders = localOrders;
-                renderOrders();
-                updateStats();
-                toast('⚠️ Saved locally only');
-            });
-    } catch(e) {
-        console.error('❌ Save error:', e);
-    }
 }
 
 // ==========================================
 // RENDER ORDERS
 // ==========================================
 function renderOrders() {
-    const tbody = document.getElementById('ordersTable');
     let filtered = orders;
-    if (filterStatus !== 'all') {
-        filtered = orders.filter(o => o.status === filterStatus);
-    }
+    if(filterStatus !== 'all') filtered = orders.filter(o => o.status === filterStatus);
+    if(currentSearch) filtered = filtered.filter(o => 
+        (o.id || '').toLowerCase().includes(currentSearch) ||
+        (o.customerName || '').toLowerCase().includes(currentSearch)
+    );
 
-    if (!filtered || filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">📦 No orders found</td></tr>';
+    const tbody = document.getElementById('ordersTable');
+    if(!tbody) return;
+
+    if(!filtered || filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text3);">📦 No orders found</td></tr>';
         return;
     }
 
@@ -307,47 +571,61 @@ function renderOrders() {
             <td><strong>${o.id || 'N/A'}</strong></td>
             <td>${o.customerName || 'Guest'}</td>
             <td>${o.customerPhone || 'N/A'}</td>
-            <td style="font-size:11px;">${(o.items || []).map(i => `${i.brand || ''} ${i.name || ''}×${i.qty || 1}`).join(', ')}</td>
+            <td style="font-size:11px;">${(o.items || []).map(i => `${i.brand||''} ${i.name||''}×${i.qty||1}`).join(', ')}</td>
             <td><strong>₹${(o.total || 0).toLocaleString()}</strong></td>
             <td>
                 <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
-                    <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>⏳ Processing</option>
-                    <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>📤 Shipped</option>
-                    <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
-                    <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                    <option value="processing" ${o.status==='processing'?'selected':''}>⏳ Processing</option>
+                    <option value="shipped" ${o.status==='shipped'?'selected':''}>📤 Shipped</option>
+                    <option value="delivered" ${o.status==='delivered'?'selected':''}>✅ Delivered</option>
+                    <option value="cancelled" ${o.status==='cancelled'?'selected':''}>❌ Cancelled</option>
                 </select>
             </td>
+            <td>${o.whatsappSent ? '✅ Sent' : '⏳ Pending'}</td>
+            <td>${o.date || 'N/A'}</td>
             <td>
-                <button class="action-btn view" onclick="viewOrder('${o.id}')">👁️</button>
-                <button class="action-btn del" onclick="deleteOrder('${o.id}')">🗑️</button>
+                <button class="action-btn view" onclick="viewOrder('${o.id}')"><i class="fas fa-eye"></i></button>
+                <button class="action-btn whatsapp" onclick="sendWhatsAppFromOrder('${o.id}')"><i class="fab fa-whatsapp"></i></button>
+                <button class="action-btn del" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
             </td>
         </tr>
     `).join('');
+
+    // Recent orders
+    const recentTbody = document.getElementById('recentOrders');
+    if(recentTbody) {
+        const recent = orders.slice(0, 5);
+        recentTbody.innerHTML = recent.map(o => `
+            <tr>
+                <td><strong>${o.id}</strong></td>
+                <td>${o.customerName || 'Guest'}</td>
+                <td>₹${(o.total || 0).toLocaleString()}</td>
+                <td><span class="status-badge ${o.status}">${(o.status || 'processing').toUpperCase()}</span></td>
+                <td>${o.whatsappSent ? '✅' : '⏳'}</td>
+                <td>${o.date || 'N/A'}</td>
+            </tr>
+        `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px;">No orders yet</td></tr>';
+    }
+
+    updateBadges();
+    updateCustomers();
 }
 
 // ==========================================
-// UPDATE STATUS (Firebase + Local)
+// UPDATE STATUS
 // ==========================================
 function updateStatus(orderId, status) {
     const order = orders.find(o => o.id === orderId);
-    if (order) {
+    if(order) {
         order.status = status;
-        
-        // Update Firebase
-        database.ref('orders/' + orderId).update({ status: status })
-            .then(() => {
-                console.log('✅ Status updated in Firebase');
-            })
-            .catch(err => {
-                console.error('❌ Firebase update error:', err);
-            });
-        
-        // Update localStorage
+        database.ref('orders/' + orderId).update({ status: status }).catch(()=>{});
         localStorage.setItem('jmd_orders', JSON.stringify(orders));
-        
-        renderOrders();
-        updateStats();
+        renderOrders(); updateStats();
         toast('✅ Status updated to ' + status);
+        // Send WhatsApp on status change
+        if(status === 'shipped' || status === 'delivered') {
+            sendWhatsApp(order);
+        }
     }
 }
 
@@ -356,12 +634,11 @@ function updateStatus(orderId, status) {
 // ==========================================
 function viewOrder(orderId) {
     const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-
+    if(!order) return;
     let html = `
         <button class="modal-close" onclick="closeModal()">✕</button>
-        <h2>📦 Order ${order.id}</h2>
-        <div style="margin-top:12px;">
+        <h2 style="margin-bottom:16px;">📦 Order ${order.id}</h2>
+        <div style="display:grid;gap:8px;">
             <p><strong>Customer:</strong> ${order.customerName || 'Guest'}</p>
             <p><strong>Email:</strong> ${order.customerEmail || 'N/A'}</p>
             <p><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</p>
@@ -373,29 +650,23 @@ function viewOrder(orderId) {
             </ul>
             <p><strong style="font-size:18px;">Total: ₹${(order.total || 0).toLocaleString()}</strong></p>
         </div>
-        <button class="btn-secondary" onclick="closeModal()">Close</button>`;
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+            <button class="btn-whatsapp" onclick="sendWhatsAppFromOrder('${order.id}'); closeModal();"><i class="fab fa-whatsapp"></i> Send WhatsApp</button>
+            <button class="btn-whatsapp-outline" onclick="closeModal();">Close</button>
+        </div>
+    `;
     openModal(html);
 }
 
 // ==========================================
-// DELETE ORDER (Firebase + Local)
+// DELETE ORDER
 // ==========================================
 function deleteOrder(orderId) {
-    if (!confirm('Delete order ' + orderId + '?')) return;
-    
-    // Delete from Firebase
-    database.ref('orders/' + orderId).remove()
-        .then(() => {
-            console.log('✅ Deleted from Firebase');
-        })
-        .catch(err => {
-            console.error('❌ Firebase delete error:', err);
-        });
-    
+    if(!confirm('Delete order ' + orderId + '?')) return;
+    database.ref('orders/' + orderId).remove().catch(()=>{});
     orders = orders.filter(o => o.id !== orderId);
     localStorage.setItem('jmd_orders', JSON.stringify(orders));
-    renderOrders();
-    updateStats();
+    renderOrders(); updateStats();
     toast('🗑️ Order deleted');
 }
 
@@ -404,8 +675,13 @@ function deleteOrder(orderId) {
 // ==========================================
 function filterOrders(status, el) {
     filterStatus = status;
-    document.querySelectorAll('#orderTabs button').forEach(b => b.classList.remove('active'));
-    if (el) el.classList.add('active');
+    document.querySelectorAll('#orderTabs .tab-btn').forEach(b => b.classList.remove('active'));
+    if(el) el.classList.add('active');
+    renderOrders();
+}
+
+function searchOrders(query) {
+    currentSearch = query.toLowerCase();
     renderOrders();
 }
 
@@ -417,11 +693,210 @@ function updateStats() {
     const revenue = orders.reduce((s, o) => s + (o.total || 0), 0);
     const customers = new Set(orders.map(o => o.customerEmail)).size;
     const pending = orders.filter(o => o.status === 'processing').length;
-
     document.getElementById('statOrders').textContent = total;
     document.getElementById('statRevenue').textContent = '₹' + revenue.toLocaleString();
     document.getElementById('statCustomers').textContent = customers;
     document.getElementById('statPending').textContent = pending;
+}
+
+function updateBadges() {
+    const processing = orders.filter(o => o.status === 'processing').length;
+    const total = orders.length;
+    document.getElementById('orderBadge').textContent = processing || '';
+    document.getElementById('countAll').textContent = total;
+    document.getElementById('countProcessing').textContent = processing;
+    document.getElementById('countShipped').textContent = orders.filter(o => o.status === 'shipped').length;
+    document.getElementById('countDelivered').textContent = orders.filter(o => o.status === 'delivered').length;
+    document.getElementById('countCancelled').textContent = orders.filter(o => o.status === 'cancelled').length;
+}
+
+function updateCustomers() {
+    const tbody = document.getElementById('customersTable');
+    if(!tbody) return;
+    const map = new Map();
+    orders.forEach(o => {
+        const email = o.customerEmail || 'guest@email.com';
+        if(!map.has(email)) {
+            map.set(email, { name: o.customerName || 'Guest', email, phone: o.customerPhone || 'N/A', orders: 0, total: 0, joined: o.date || 'N/A' });
+        }
+        const c = map.get(email);
+        c.orders += 1;
+        c.total += (o.total || 0);
+    });
+    tbody.innerHTML = Array.from(map.values()).map(c => `
+        <tr><td><strong>${c.name}</strong></td><td>${c.email}</td><td>${c.phone}</td><td>${c.orders}</td><td>₹${c.total.toLocaleString()}</td><td>${c.joined}</td></tr>
+    `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:30px;">No customers yet</td></tr>';
+}
+
+// ==========================================
+// 🔥 WHATSAPP FUNCTIONS
+// ==========================================
+function sendWhatsApp(order) {
+    if(!isWhatsAppActive) return false;
+    const phone = WHATSAPP_CONFIG.adminNumber || '+919999999999';
+    const itemsList = (order.items || []).map(i => `• ${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}`).join('\n');
+    let msg = WHATSAPP_CONFIG.template
+        .replace(/{orderId}/g, order.id)
+        .replace(/{customer}/g, order.customerName || 'Guest')
+        .replace(/{phone}/g, order.customerPhone || 'N/A')
+        .replace(/{total}/g, (order.total || 0).toLocaleString())
+        .replace(/{items}/g, itemsList)
+        .replace(/{status}/g, order.status || 'Processing');
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    const log = { orderId: order.id, phone, timestamp: new Date().toLocaleString(), status: 'sent' };
+    whatsappLogs.unshift(log);
+    localStorage.setItem('whatsapp_logs', JSON.stringify(whatsappLogs));
+    updateWhatsAppLogs();
+    order.whatsappSent = true;
+    database.ref('orders/' + order.id).update({ whatsappSent: true }).catch(()=>{});
+    localStorage.setItem('jmd_orders', JSON.stringify(orders));
+    document.getElementById('statWhatsApp').textContent = whatsappLogs.length;
+    toast('💬 WhatsApp sent!');
+    return true;
+}
+
+function sendWhatsAppFromOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if(order) sendWhatsApp(order);
+}
+
+function testWhatsApp() {
+    const testOrder = {
+        id: 'TEST' + Date.now().toString().slice(-6),
+        customerName: 'Test Customer',
+        customerPhone: '+919999999999',
+        total: 3999,
+        status: 'processing',
+        items: [{ brand: 'Nike', name: 'Air Max', qty: 1, price: 3999 }]
+    };
+    sendWhatsApp(testOrder);
+}
+
+function toggleWhatsApp() {
+    isWhatsAppActive = !isWhatsAppActive;
+    const btn = document.getElementById('whatsappToggleBtn');
+    const dot = document.getElementById('whatsappDot');
+    const statusText = document.getElementById('whatsappStatusText');
+    const badge = document.getElementById('whatsappBadge');
+    if(isWhatsAppActive) {
+        btn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+        dot.className = 'dot active';
+        statusText.textContent = 'Active — New orders will be sent to WhatsApp';
+        badge.textContent = 'ON';
+        badge.style.background = '#25D366';
+        toast('✅ WhatsApp activated');
+    } else {
+        btn.innerHTML = '<i class="fas fa-play"></i> Resume';
+        dot.className = 'dot inactive';
+        statusText.textContent = 'Paused — Orders will be saved but no WhatsApp messages';
+        badge.textContent = 'OFF';
+        badge.style.background = '#ff4444';
+        toast('⏸️ WhatsApp paused');
+    }
+    localStorage.setItem('whatsapp_active', JSON.stringify(isWhatsAppActive));
+}
+
+function saveWhatsAppSettings() {
+    const number = document.getElementById('adminWhatsApp').value;
+    const template = document.getElementById('whatsappTemplate').value;
+    WHATSAPP_CONFIG.adminNumber = number;
+    WHATSAPP_CONFIG.template = template;
+    localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
+    toast('✅ WhatsApp settings saved!');
+}
+
+function loadWhatsAppSettings() {
+    try {
+        const saved = localStorage.getItem('whatsapp_config');
+        if(saved) {
+            const config = JSON.parse(saved);
+            WHATSAPP_CONFIG.adminNumber = config.adminNumber || WHATSAPP_CONFIG.adminNumber;
+            WHATSAPP_CONFIG.template = config.template || WHATSAPP_CONFIG.template;
+        }
+        const active = localStorage.getItem('whatsapp_active');
+        if(active !== null) isWhatsAppActive = JSON.parse(active);
+        if(!isWhatsAppActive) {
+            document.getElementById('whatsappToggleBtn').innerHTML = '<i class="fas fa-play"></i> Resume';
+            document.getElementById('whatsappDot').className = 'dot inactive';
+            document.getElementById('whatsappStatusText').textContent = 'Paused — Orders will be saved but no WhatsApp messages';
+            document.getElementById('whatsappBadge').textContent = 'OFF';
+            document.getElementById('whatsappBadge').style.background = '#ff4444';
+        }
+        document.getElementById('adminWhatsApp').value = WHATSAPP_CONFIG.adminNumber;
+        document.getElementById('whatsappTemplate').value = WHATSAPP_CONFIG.template;
+        // Update preview
+        document.getElementById('templatePreview').textContent = WHATSAPP_CONFIG.template
+            .replace(/{orderId}/g, 'ORD12345678')
+            .replace(/{customer}/g, 'John Doe')
+            .replace(/{phone}/g, '+919999999999')
+            .replace(/{total}/g, '3,999')
+            .replace(/{items}/g, '• Nike Air Max × 1 = ₹3,999')
+            .replace(/{status}/g, 'Processing');
+    } catch(e){}
+    loadWhatsAppLogs();
+}
+
+function loadWhatsAppLogs() {
+    try {
+        const saved = localStorage.getItem('whatsapp_logs');
+        if(saved) whatsappLogs = JSON.parse(saved);
+    } catch(e){ whatsappLogs = []; }
+    updateWhatsAppLogs();
+    document.getElementById('statWhatsApp').textContent = whatsappLogs.length;
+}
+
+function updateWhatsAppLogs() {
+    const container = document.getElementById('whatsappLogs');
+    if(!container) return;
+    if(whatsappLogs.length === 0) {
+        container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:12px;">No WhatsApp messages sent yet</div>';
+        return;
+    }
+    container.innerHTML = whatsappLogs.slice(0, 10).map(log => `
+        <div style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;">
+            <span>📱 ${log.orderId}</span>
+            <span style="color:var(--text2);">${log.timestamp}</span>
+            <span style="color:#25D366;">✅ ${log.status}</span>
+        </div>
+    `).join('');
+}
+
+function sendTestMessage() {
+    testWhatsApp();
+}
+
+// ==========================================
+// SWITCH TABS
+// ==========================================
+function switchTab(tab) {
+    currentTab = tab;
+    ['Dashboard', 'Orders', 'Whatsapp', 'Customers', 'Settings'].forEach(t => {
+        document.getElementById('tab' + t).style.display = 'none';
+    });
+    const tabName = tab.charAt(0).toUpperCase() + tab.slice(1);
+    document.getElementById('tab' + tabName).style.display = 'block';
+    document.getElementById('pageTitle').textContent = tabName;
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        if(item.textContent.trim().toLowerCase().includes(tab)) item.classList.add('active');
+    });
+    if(tab === 'orders') renderOrders();
+    if(tab === 'dashboard') updateStats();
+    if(tab === 'whatsapp') loadWhatsAppSettings();
+    if(tab === 'customers') updateCustomers();
+    closeSidebar();
+}
+
+// ==========================================
+// SIDEBAR
+// ==========================================
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
 // ==========================================
@@ -446,57 +921,69 @@ function closeModal() {
     document.getElementById('modalOverlay').classList.remove('show');
 }
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-});
-
 // ==========================================
-// INIT
-// ==========================================
-function init() {
-    // Check if already logged in
-    if (localStorage.getItem('admin_logged') === 'true') {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        
-        // Load orders
-        loadOrders();
-        
-        // Start Firebase listener for realtime updates
-        startFirebaseListener();
-    }
-    
-    // Dark mode
-    if (localStorage.getItem('admin_darkmode') === 'true') {
-        document.body.classList.add('dark-mode');
-    }
-}
-
-// ==========================================
-// DARK MODE TOGGLE
+// DARK MODE
 // ==========================================
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     localStorage.setItem('admin_darkmode', document.body.classList.contains('dark-mode'));
 }
 
-// Expose functions globally
+// ==========================================
+// SAVE ADMIN SETTINGS
+// ==========================================
+function saveAdminSettings() {
+    const email = document.getElementById('adminEmail').value;
+    const pass = document.getElementById('adminPassword').value;
+    if(email) ADMIN.email = email;
+    if(pass) ADMIN.password = pass;
+    toast('✅ Admin settings saved!');
+}
+
+// ==========================================
+// INIT
+// ==========================================
+function init() {
+    if(localStorage.getItem('admin_logged') === 'true') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadOrders();
+        startFirebaseListener();
+        loadWhatsAppSettings();
+    }
+    if(localStorage.getItem('admin_darkmode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape') closeModal();
+        if(e.ctrlKey && e.key === 'r') { e.preventDefault(); loadOrders(); }
+    });
+}
+
+// Expose globally
 window.loadOrders = loadOrders;
 window.updateStatus = updateStatus;
 window.deleteOrder = deleteOrder;
 window.viewOrder = viewOrder;
 window.filterOrders = filterOrders;
+window.searchOrders = searchOrders;
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.toast = toast;
 window.closeModal = closeModal;
 window.openModal = openModal;
 window.toggleDarkMode = toggleDarkMode;
+window.toggleSidebar = toggleSidebar;
+window.switchTab = switchTab;
+window.sendWhatsAppFromOrder = sendWhatsAppFromOrder;
+window.testWhatsApp = testWhatsApp;
+window.toggleWhatsApp = toggleWhatsApp;
+window.saveWhatsAppSettings = saveWhatsAppSettings;
+window.sendTestMessage = sendTestMessage;
+window.saveAdminSettings = saveAdminSettings;
 
-// ==========================================
-// START
-// ==========================================
-console.log('🔥 JMD Admin Panel with Firebase');
+console.log('🔥 JMD Admin Panel v2.0 Loaded!');
 init();
 </script>
 </body>
