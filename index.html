@@ -1741,55 +1741,8 @@
 
     initAdmin();
 
-loadOrdersFromGitHub();
-
-setInterval(() => {
-
-    loadOrdersFromGitHub();
-
-}, 5000);
-
-async function loadOrdersFromGitHub(){
-
-    try{
-
-        const apiUrl =
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/orders.json`;
-
-        const response = await fetch(apiUrl, {
-
-            headers: {
-                Authorization:
-                `token ${GITHUB_CONFIG.token}`
-            }
-
-        });
-
-        const data =
-        await response.json();
-
-        const content =
-        atob(data.content);
-
-        orders =
-        JSON.parse(content);
-
-        renderOrders();
-
-        updateDashboard();
-
-        console.log('✅ ORDERS LOADED');
-
-    }catch(error){
-
-        console.log('❌ ERROR:', error);
-
-    }
-
-}
-
-</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
@@ -1807,105 +1760,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 // ==========================================
-// FIREBASE SAVE
+// FIREBASE LIVE ORDERS
 // ==========================================
 
-async function saveOrderToFirebase(order){
+firebase.database()
+.ref('orders')
+.on('value', snapshot => {
 
-    try{
+    orders = [];
 
-        await firebase.database()
-        .ref('orders/' + order.id)
-        .set(order);
+    snapshot.forEach(child => {
 
-        console.log('✅ Firebase Saved');
+        orders.unshift(child.val());
 
-    }catch(err){
+    });
 
-        console.log(err);
+    console.log('✅ FIREBASE CONNECTED');
 
-    }
+    renderOrders();
 
-}
+    updateDashboard();
 
-// ==========================================
-// OVERRIDE CHECKOUT
-// ==========================================
+    renderCustomers();
 
-const oldCheckout = checkout;
-
-checkout = async function(){
-
-    if (cart.length === 0) {
-        showToast('🛒 Cart is empty');
-        return;
-    }
-
-    const total = cart.reduce((sum, c) => sum + (c.price * c.qty), 0);
-
-    const orderId =
-    'ORD' + Date.now().toString().slice(-8);
-
-    const order = {
-
-        id: orderId,
-
-        items:
-        JSON.parse(JSON.stringify(cart)),
-
-        total: total,
-
-        customerName:
-        currentUser ? currentUser.name : 'Guest',
-
-        customerEmail:
-        currentUser ? currentUser.email : 'guest@email.com',
-
-        customerPhone:
-        currentUser ? currentUser.phone : 'N/A',
-
-        date:
-        new Date().toLocaleDateString(),
-
-        status: 'processing'
-
-    };
-
-    // LOCAL
-    let existingOrders =
-    JSON.parse(
-        localStorage.getItem('jmd_orders') || '[]'
-    );
-
-    existingOrders.unshift(order);
-
-    localStorage.setItem(
-        'jmd_orders',
-        JSON.stringify(existingOrders)
-    );
-
-    orders = existingOrders;
-
-    // FIREBASE
-    await saveOrderToFirebase(order);
-
-    // UI
-    cart = [];
-
-    saveToStorage();
-
-    updateCounts();
-
-    closeModal();
-
-    showToast('🎉 Order Placed!');
-
-    alert(
-        `🎉 ORDER CONFIRMED!\n\nOrder ID: ${orderId}`
-    );
-
-    renderProducts(currentFilter);
-
-};
+});
 
 </script>
