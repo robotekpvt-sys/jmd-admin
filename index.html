@@ -1740,6 +1740,52 @@
     }
 
     initAdmin();
-    </script>
-</body>
-</html>
+
+loadOrdersFromGitHub();
+
+setInterval(() => {
+
+    loadOrdersFromGitHub();
+
+}, 5000);
+
+async function loadOrdersFromGitHub(){
+
+    try{
+
+        const apiUrl =
+        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/orders.json`;
+
+        const response = await fetch(apiUrl, {
+
+            headers: {
+                Authorization:
+                `token ${GITHUB_CONFIG.token}`
+            }
+
+        });
+
+        const data =
+        await response.json();
+
+        const content =
+        atob(data.content);
+
+        orders =
+        JSON.parse(content);
+
+        renderOrders();
+
+        updateDashboard();
+
+        console.log('✅ ORDERS LOADED');
+
+    }catch(error){
+
+        console.log('❌ ERROR:', error);
+
+    }
+
+}
+
+</script>
