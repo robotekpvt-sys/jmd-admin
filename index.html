@@ -713,6 +713,35 @@
             display: block;
         }
 
+        /* ===== REFRESH BUTTON ===== */
+        .refresh-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:hover {
+            background: var(--border-color);
+            transform: rotate(15deg);
+        }
+
+        .refresh-btn.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .sidebar {
@@ -797,7 +826,7 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <span class="jmd">JMD</span><span class="boot">BOOT</span>
-                <small>Admin Panel v2.0</small>
+                <small>Admin Panel</small>
             </div>
             <div class="sidebar-menu">
                 <div class="sidebar-item active" onclick="switchTab('dashboard')">
@@ -809,10 +838,6 @@
                 </div>
                 <div class="sidebar-item" onclick="switchTab('products')">
                     <span class="icon">👟</span> Products
-                </div>
-                <div class="sidebar-item" onclick="switchTab('whatsapp')">
-                    <span class="icon">💬</span> WhatsApp
-                    <span class="badge whatsapp" id="whatsappBadge">ON</span>
                 </div>
                 <div class="sidebar-item" onclick="switchTab('customers')">
                     <span class="icon">👤</span> Customers
@@ -840,23 +865,9 @@
                 </div>
                 <div class="header-actions">
                     <span style="font-size:13px;color:var(--text-secondary);" id="adminUser">👤 Admin</span>
+                    <button class="refresh-btn" onclick="refreshOrders()" id="refreshBtn">🔄 Refresh</button>
                     <button class="admin-toggle" onclick="toggleDarkMode()">🌙</button>
                     <button class="admin-toggle" onclick="window.open('index.html', '_blank')" title="View Store">🏪</button>
-                </div>
-            </div>
-
-            <!-- ===== WHATSAPP STATUS BAR ===== -->
-            <div class="whatsapp-status" id="whatsappStatusBar">
-                <div class="status">
-                    <span class="dot active" id="whatsappDot"></span>
-                    <div>
-                        <div class="label">💬 WhatsApp Notifications</div>
-                        <div class="sub" id="whatsappStatusText">Active - New orders will be sent to WhatsApp</div>
-                    </div>
-                </div>
-                <div class="actions">
-                    <button class="btn-whatsapp" onclick="testWhatsApp()">📱 Test Message</button>
-                    <button class="btn-whatsapp-secondary" onclick="toggleWhatsApp()" id="whatsappToggleBtn">⏸️ Pause</button>
                 </div>
             </div>
 
@@ -867,25 +878,21 @@
                         <div class="icon-big">📦</div>
                         <div class="label">Total Orders</div>
                         <div class="value" id="totalOrders">0</div>
-                        <div class="change up">↑ 12% this month</div>
                     </div>
                     <div class="stat-card">
                         <div class="icon-big">💰</div>
                         <div class="label">Revenue</div>
                         <div class="value" id="totalRevenue">₹0</div>
-                        <div class="change up">↑ 8% this month</div>
                     </div>
                     <div class="stat-card">
                         <div class="icon-big">👥</div>
                         <div class="label">Customers</div>
                         <div class="value" id="totalCustomers">0</div>
-                        <div class="change up">↑ 5% this month</div>
                     </div>
                     <div class="stat-card">
-                        <div class="icon-big">💬</div>
-                        <div class="label">WhatsApp Sent</div>
-                        <div class="value" id="totalWhatsApp">0</div>
-                        <div class="whatsapp-badge">📱 Active</div>
+                        <div class="icon-big">⏳</div>
+                        <div class="label">Pending Orders</div>
+                        <div class="value" id="totalPending">0</div>
                     </div>
                 </div>
 
@@ -902,7 +909,6 @@
                                     <th>Customer</th>
                                     <th>Amount</th>
                                     <th>Status</th>
-                                    <th>WhatsApp</th>
                                     <th>Date</th>
                                 </tr>
                             </thead>
@@ -939,7 +945,6 @@
                                     <th>Items</th>
                                     <th>Amount</th>
                                     <th>Status</th>
-                                    <th>WhatsApp</th>
                                     <th>Date</th>
                                     <th>Action</th>
                                 </tr>
@@ -1009,49 +1014,6 @@
                 </div>
             </div>
 
-            <!-- ===== WHATSAPP TAB ===== -->
-            <div id="tabWhatsapp" style="display:none;">
-                <div class="table-container" style="padding:24px;">
-                    <h3 style="margin-bottom:16px;">💬 WhatsApp Notification Settings</h3>
-                    
-                    <div style="display:grid;gap:16px;max-width:600px;">
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">📱 Admin WhatsApp Number</label>
-                            <input type="text" id="adminWhatsApp" value="+919999999999" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
-                            <small style="color:var(--text-muted);font-size:11px;">Include country code (e.g., +91 for India)</small>
-                        </div>
-
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">📝 WhatsApp Message Template</label>
-                            <textarea id="whatsappTemplate" rows="6" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:13px;color:var(--text-primary);outline:none;margin-top:4px;font-family:monospace;">🛍️ *New Order!*
-
-Order ID: {orderId}
-Customer: {customer}
-Phone: {phone}
-Total: ₹{total}
-
-Items:
-{items}
-
-Status: {status}
-
-📦 Thank you for shopping at JMD BOOT HOUSE!</textarea>
-                            <small style="color:var(--text-muted);font-size:11px;">Use {orderId}, {customer}, {phone}, {total}, {items}, {status} as placeholders</small>
-                        </div>
-
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                            <button class="btn-whatsapp" onclick="saveWhatsAppSettings()">💾 Save Settings</button>
-                            <button class="btn-whatsapp-secondary" onclick="sendTestMessage()">📱 Send Test Message</button>
-                        </div>
-
-                        <div style="margin-top:16px;padding:16px;background:var(--input-bg);border-radius:12px;border-left:4px solid #25D366;">
-                            <h4>📋 Recent WhatsApp Logs</h4>
-                            <div id="whatsappLogs" style="margin-top:8px;font-size:12px;max-height:200px;overflow-y:auto;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- ===== CUSTOMERS TAB ===== -->
             <div id="tabCustomers" style="display:none;">
                 <div class="table-container">
@@ -1082,16 +1044,24 @@ Status: {status}
                     <h3 style="margin-bottom:16px;">⚙️ Admin Settings</h3>
                     <div style="display:grid;gap:12px;max-width:500px;">
                         <div>
+                            <label style="font-weight:600;font-size:13px;">GitHub Owner</label>
+                            <input type="text" id="gitOwner" value="robotekpvt-sys" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:600;font-size:13px;">GitHub Repo</label>
+                            <input type="text" id="gitRepo" value="jmd-boot-store" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:600;font-size:13px;">GitHub Token</label>
+                            <input type="password" id="gitToken" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
+                        </div>
+                        <div>
                             <label style="font-weight:600;font-size:13px;">Admin Email</label>
                             <input type="email" id="adminEmail" value="admin@jmdboot.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
                         </div>
                         <div>
                             <label style="font-weight:600;font-size:13px;">New Password</label>
                             <input type="password" id="adminPassword" placeholder="Enter new password" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
-                        </div>
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">Store Name</label>
-                            <input type="text" id="storeName" value="JMD BOOT HOUSE" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
                         </div>
                         <button class="btn-submit" onclick="saveSettings()" style="max-width:200px;">💾 Save Settings</button>
                     </div>
@@ -1111,40 +1081,13 @@ Status: {status}
 
     <script>
     // ==========================================
-    // 🔥 GITHUB CONFIGURATION
+    // 🔥 GITHUB CONFIGURATION - YAHAN BADALO 🔥
     // ==========================================
-    const GITHUB_CONFIG = {
-        owner: 'YOUR_GITHUB_USERNAME',  // 🔥 CHANGE THIS
-        repo: 'YOUR_REPO_NAME',          // 🔥 CHANGE THIS
-        token: 'ghp_xxxxxxxxxxxxxxxxxxxx', // 🔥 CHANGE THIS
+    let GITHUB_CONFIG = {
+        owner: 'robotekpvt-sys',     // 🔥 YOUR USERNAME
+        repo: 'jmd-boot-store',       // 🔥 YOUR REPO
+        token: 'ghp_xxxxxxxxxxxx',    // 🔥 YOUR TOKEN
         branch: 'main'
-    };
-
-    const GITHUB_API = {
-        rawOrders: `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/orders.json`,
-        updateOrders: `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/orders.json`
-    };
-
-    // ==========================================
-    // 🔥 WHATSAPP CONFIGURATION
-    // ==========================================
-    // 🔥 YAHAN APNA WHATSAPP NUMBER DAALO 🔥
-    const WHATSAPP_CONFIG = {
-        adminNumber: '+919999999999', // Change to your number
-        isActive: true,
-        template: `🛍️ *New Order!*
-
-Order ID: {orderId}
-Customer: {customer}
-Phone: {phone}
-Total: ₹{total}
-
-Items:
-{items}
-
-Status: {status}
-
-📦 Thank you for shopping at JMD BOOT HOUSE!`
     };
 
     // ==========================================
@@ -1153,11 +1096,9 @@ Status: {status}
     let orders = [];
     let products = [];
     let customers = [];
-    let currentOrders = [];
     let currentFilter = 'all';
     let currentSearch = '';
-    let whatsappLogs = [];
-    let isWhatsAppActive = true;
+    let isDarkMode = false;
 
     // ==========================================
     // ADMIN CREDENTIALS
@@ -1168,7 +1109,7 @@ Status: {status}
     };
 
     // ==========================================
-    // INIT ADMIN PANEL
+    // INIT ADMIN
     // ==========================================
     function initAdmin() {
         const loggedIn = sessionStorage.getItem('adminLoggedIn');
@@ -1177,13 +1118,182 @@ Status: {status}
             return;
         }
         
-        loadData();
-        updateDashboard();
-        renderOrders();
+        // Load saved settings
+        loadSettings();
+        
+        // Load from localStorage
+        loadLocalData();
+        
+        // Fetch from GitHub
+        fetchOrdersFromGitHub();
+        
         renderProducts();
         renderCustomers();
         updateBadges();
-        loadWhatsAppSettings();
+        
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            fetchOrdersFromGitHub();
+        }, 30000);
+    }
+
+    // ==========================================
+    // SETTINGS
+    // ==========================================
+    function loadSettings() {
+        try {
+            const saved = localStorage.getItem('jmd_admin_settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                GITHUB_CONFIG.owner = settings.owner || GITHUB_CONFIG.owner;
+                GITHUB_CONFIG.repo = settings.repo || GITHUB_CONFIG.repo;
+                GITHUB_CONFIG.token = settings.token || GITHUB_CONFIG.token;
+                ADMIN_CREDENTIALS.email = settings.adminEmail || ADMIN_CREDENTIALS.email;
+                if (settings.adminPassword) ADMIN_CREDENTIALS.password = settings.adminPassword;
+            }
+        } catch(e) {}
+        
+        // Load products
+        try {
+            const savedProducts = localStorage.getItem('jmd_admin_products');
+            if (savedProducts) products = JSON.parse(savedProducts);
+        } catch(e) {}
+        
+        if (products.length === 0) {
+            products = [
+                { id: 1, brand: "Nike", name: "Air Max Premium", category: "sneakers", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=900&auto=format&fit=crop", price: 3999, oldPrice: 7999, rating: 4.8, reviews: 245, badge: "NEW" },
+                { id: 2, brand: "Adidas", name: "Ultraboost Running", category: "running", image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=900&auto=format&fit=crop", price: 2499, oldPrice: 5999, rating: 4.7, reviews: 189, badge: "HOT" },
+                { id: 3, brand: "Puma", name: "Leather Boots", category: "boots", image: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?q=80&w=900&auto=format&fit=crop", price: 4299, oldPrice: 8999, rating: 4.6, reviews: 132, badge: "TRENDING" }
+            ];
+            saveProducts();
+        }
+    }
+
+    function saveSettings() {
+        const settings = {
+            owner: document.getElementById('gitOwner').value,
+            repo: document.getElementById('gitRepo').value,
+            token: document.getElementById('gitToken').value,
+            adminEmail: document.getElementById('adminEmail').value,
+            adminPassword: document.getElementById('adminPassword').value || ADMIN_CREDENTIALS.password
+        };
+        
+        localStorage.setItem('jmd_admin_settings', JSON.stringify(settings));
+        GITHUB_CONFIG.owner = settings.owner;
+        GITHUB_CONFIG.repo = settings.repo;
+        GITHUB_CONFIG.token = settings.token;
+        ADMIN_CREDENTIALS.email = settings.adminEmail;
+        if (settings.adminPassword) ADMIN_CREDENTIALS.password = settings.adminPassword;
+        
+        showToast('✅ Settings saved!');
+        fetchOrdersFromGitHub();
+    }
+
+    function saveProducts() {
+        localStorage.setItem('jmd_admin_products', JSON.stringify(products));
+    }
+
+    // ==========================================
+    // LOAD LOCAL DATA
+    // ==========================================
+    function loadLocalData() {
+        try {
+            const savedOrders = localStorage.getItem('jmd_orders');
+            if (savedOrders) orders = JSON.parse(savedOrders);
+            
+            const savedCustomers = localStorage.getItem('jmd_customers');
+            if (savedCustomers) customers = JSON.parse(savedCustomers);
+        } catch(e) {}
+    }
+
+    // ==========================================
+    // 🔥 FETCH ORDERS FROM GITHUB
+    // ==========================================
+    async function fetchOrdersFromGitHub() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        refreshBtn.classList.add('spinning');
+        
+        try {
+            const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/orders.json?t=${Date.now()}`;
+            const response = await fetch(url);
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    orders = data;
+                    localStorage.setItem('jmd_orders', JSON.stringify(orders));
+                    showToast('✅ Orders updated from GitHub!');
+                } else {
+                    // If GitHub returns empty, keep local orders
+                    console.log('⚠️ No orders on GitHub, using local');
+                }
+            } else {
+                console.log('⚠️ GitHub fetch failed, using local orders');
+            }
+        } catch (error) {
+            console.error('❌ Error fetching from GitHub:', error);
+        }
+        
+        // Update UI
+        updateDashboard();
+        renderOrders();
+        renderCustomers();
+        updateBadges();
+        
+        refreshBtn.classList.remove('spinning');
+    }
+
+    // ==========================================
+    // SAVE ORDERS TO GITHUB
+    // ==========================================
+    async function saveOrdersToGitHub() {
+        try {
+            if (!GITHUB_CONFIG.token || GITHUB_CONFIG.token === 'ghp_xxxxxxxxxxxx') {
+                console.log('⚠️ No GitHub token, saving locally only');
+                localStorage.setItem('jmd_orders', JSON.stringify(orders));
+                return;
+            }
+            
+            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/orders.json`;
+            
+            // Get current file SHA
+            const getRes = await fetch(url, {
+                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
+            });
+            let sha = null;
+            if (getRes.ok) {
+                const d = await getRes.json();
+                sha = d.sha;
+            }
+            
+            // Update file
+            await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Update orders - ${new Date().toLocaleString()}`,
+                    content: btoa(JSON.stringify(orders, null, 2)),
+                    sha: sha,
+                    branch: GITHUB_CONFIG.branch
+                })
+            });
+            
+            localStorage.setItem('jmd_orders', JSON.stringify(orders));
+            console.log('✅ Orders saved to GitHub');
+        } catch(e) {
+            console.log('⚠️ GitHub save failed, saved locally');
+            localStorage.setItem('jmd_orders', JSON.stringify(orders));
+        }
+    }
+
+    // ==========================================
+    // REFRESH ORDERS
+    // ==========================================
+    function refreshOrders() {
+        fetchOrdersFromGitHub();
     }
 
     // ==========================================
@@ -1191,14 +1301,17 @@ Status: {status}
     // ==========================================
     function showAdminLogin() {
         const html = `
-            <h2 style="margin-bottom:16px;">🔐 Admin Login</h2>
-            <label>Email</label>
-            <input type="email" id="loginEmail" value="admin@jmdboot.com" style="width:100%;padding:12px;border:2px solid var(--border-color);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);">
-            <label>Password</label>
-            <input type="password" id="loginPassword" value="admin123" style="width:100%;padding:12px;border:2px solid var(--border-color);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);">
-            <button class="btn-submit" onclick="adminLogin()">Sign In</button>
+            <div style="max-width:400px;margin:60px auto;padding:40px;background:var(--bg-card);border-radius:28px;border:1px solid var(--border-color);">
+                <h2 style="margin-bottom:20px;">🔐 Admin Login</h2>
+                <label style="font-weight:600;font-size:13px;color:var(--text-secondary);">Email</label>
+                <input type="email" id="loginEmail" value="admin@jmdboot.com" style="width:100%;padding:14px;border:2px solid var(--border-color);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);">
+                <label style="font-weight:600;font-size:13px;color:var(--text-secondary);">Password</label>
+                <input type="password" id="loginPassword" value="admin123" style="width:100%;padding:14px;border:2px solid var(--border-color);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);">
+                <button class="btn-submit" onclick="adminLogin()">Sign In</button>
+                <p style="margin-top:12px;font-size:12px;color:var(--text-muted);text-align:center;">Default: admin@jmdboot.com / admin123</p>
+            </div>
         `;
-        document.getElementById('mainContent').innerHTML = `<div style="max-width:400px;margin:60px auto;">${html}</div>`;
+        document.getElementById('mainContent').innerHTML = html;
     }
 
     function adminLogin() {
@@ -1221,300 +1334,18 @@ Status: {status}
     }
 
     // ==========================================
-    // LOAD DATA
-    // ==========================================
-    function loadData() {
-        try {
-            const savedOrders = localStorage.getItem('jmd_orders');
-            const savedProducts = localStorage.getItem('jmd_admin_products');
-            const savedCustomers = localStorage.getItem('jmd_customers');
-            
-            if (savedOrders) orders = JSON.parse(savedOrders);
-            if (savedProducts) products = JSON.parse(savedProducts);
-            if (savedCustomers) customers = JSON.parse(savedCustomers);
-        } catch (e) {}
-        
-        if (products.length === 0) {
-            products = [
-                { id: 1, brand: "Nike", name: "Air Max Premium", category: "sneakers", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=900&auto=format&fit=crop", price: 3999, oldPrice: 7999, rating: 4.8, reviews: 245, badge: "NEW" },
-                { id: 2, brand: "Adidas", name: "Ultraboost Running", category: "running", image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=900&auto=format&fit=crop", price: 2499, oldPrice: 5999, rating: 4.7, reviews: 189, badge: "HOT" },
-                { id: 3, brand: "Puma", name: "Leather Boots", category: "boots", image: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?q=80&w=900&auto=format&fit=crop", price: 4299, oldPrice: 8999, rating: 4.6, reviews: 132, badge: "TRENDING" }
-            ];
-            saveProducts();
-        }
-        
-        currentOrders = [...orders];
-    }
-
-    function saveOrders() {
-        localStorage.setItem('jmd_orders', JSON.stringify(orders));
-        // Also try to save to GitHub
-        saveToGitHub('orders.json', orders);
-    }
-
-    function saveProducts() {
-        localStorage.setItem('jmd_admin_products', JSON.stringify(products));
-    }
-
-    function saveCustomers() {
-        localStorage.setItem('jmd_customers', JSON.stringify(customers));
-    }
-
-    // ==========================================
-    // GITHUB SAVE
-    // ==========================================
-    async function saveToGitHub(path, data) {
-        try {
-            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
-            
-            const getRes = await fetch(url, {
-                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
-            });
-            let sha = null;
-            if (getRes.ok) {
-                const fileData = await getRes.json();
-                sha = fileData.sha;
-            }
-
-            await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Update ${path}`,
-                    content: btoa(JSON.stringify(data, null, 2)),
-                    sha: sha,
-                    branch: GITHUB_CONFIG.branch
-                })
-            });
-        } catch (error) {
-            console.error('GitHub save error:', error);
-        }
-    }
-
-    // ==========================================
-    // 🔥 WHATSAPP FUNCTIONS
-    // ==========================================
-    
-    // Send WhatsApp Message
-    function sendWhatsApp(order) {
-        if (!isWhatsAppActive) {
-            console.log('WhatsApp notifications are paused');
-            return false;
-        }
-
-        const phone = WHATSAPP_CONFIG.adminNumber || '+919999999999';
-        const template = WHATSAPP_CONFIG.template || WHATSAPP_CONFIG.template;
-        
-        // Format items
-        const itemsList = order.items.map(i => `• ${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}`).join('\n');
-        
-        // Replace placeholders
-        let message = template
-            .replace(/{orderId}/g, order.id)
-            .replace(/{customer}/g, order.customerName || 'Guest')
-            .replace(/{phone}/g, order.customerPhone || 'N/A')
-            .replace(/{total}/g, order.total.toLocaleString())
-            .replace(/{items}/g, itemsList)
-            .replace(/{status}/g, order.status || 'Processing');
-
-        // Create WhatsApp URL
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-
-        // Open WhatsApp
-        window.open(whatsappUrl, '_blank');
-
-        // Log
-        const log = {
-            orderId: order.id,
-            phone: phone,
-            timestamp: new Date().toLocaleString(),
-            status: 'sent'
-        };
-        whatsappLogs.unshift(log);
-        saveWhatsAppLogs();
-        updateWhatsAppLogs();
-
-        // Update stats
-        const count = parseInt(document.getElementById('totalWhatsApp').textContent) || 0;
-        document.getElementById('totalWhatsApp').textContent = count + 1;
-
-        showToast('💬 WhatsApp message sent!');
-        return true;
-    }
-
-    // Test WhatsApp
-    function testWhatsApp() {
-        const testOrder = {
-            id: 'TEST' + Date.now().toString().slice(-6),
-            customerName: 'Test Customer',
-            customerPhone: '+919999999999',
-            total: 3999,
-            status: 'processing',
-            items: [
-                { brand: 'Nike', name: 'Air Max', qty: 1, price: 3999 }
-            ]
-        };
-        sendWhatsApp(testOrder);
-    }
-
-    // Save WhatsApp Settings
-    function saveWhatsAppSettings() {
-        const number = document.getElementById('adminWhatsApp').value;
-        const template = document.getElementById('whatsappTemplate').value;
-        
-        WHATSAPP_CONFIG.adminNumber = number;
-        WHATSAPP_CONFIG.template = template;
-        
-        localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
-        showToast('✅ WhatsApp settings saved!');
-    }
-
-    // Load WhatsApp Settings
-    function loadWhatsAppSettings() {
-        try {
-            const saved = localStorage.getItem('whatsapp_config');
-            if (saved) {
-                const config = JSON.parse(saved);
-                WHATSAPP_CONFIG.adminNumber = config.adminNumber || WHATSAPP_CONFIG.adminNumber;
-                WHATSAPP_CONFIG.template = config.template || WHATSAPP_CONFIG.template;
-            }
-            if (WHATSAPP_CONFIG.adminNumber) {
-                document.getElementById('adminWhatsApp').value = WHATSAPP_CONFIG.adminNumber;
-            }
-            if (WHATSAPP_CONFIG.template) {
-                document.getElementById('whatsappTemplate').value = WHATSAPP_CONFIG.template;
-            }
-        } catch (e) {}
-        
-        loadWhatsAppLogs();
-        updateWhatsAppLogs();
-    }
-
-    // Save WhatsApp Logs
-    function saveWhatsAppLogs() {
-        localStorage.setItem('whatsapp_logs', JSON.stringify(whatsappLogs));
-    }
-
-    // Load WhatsApp Logs
-    function loadWhatsAppLogs() {
-        try {
-            const saved = localStorage.getItem('whatsapp_logs');
-            if (saved) {
-                whatsappLogs = JSON.parse(saved);
-            }
-        } catch (e) {
-            whatsappLogs = [];
-        }
-    }
-
-    // Update WhatsApp Logs Display
-    function updateWhatsAppLogs() {
-        const container = document.getElementById('whatsappLogs');
-        if (!container) return;
-        
-        if (whatsappLogs.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:12px;">No WhatsApp messages sent yet</div>';
-            return;
-        }
-        
-        container.innerHTML = whatsappLogs.slice(0, 10).map(log => `
-            <div style="padding:6px 0;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;">
-                <span>📱 ${log.orderId}</span>
-                <span style="color:var(--text-secondary);">${log.timestamp}</span>
-                <span style="color:#25D366;">✅ ${log.status}</span>
-            </div>
-        `).join('');
-    }
-
-    // Toggle WhatsApp
-    function toggleWhatsApp() {
-        isWhatsAppActive = !isWhatsAppActive;
-        const btn = document.getElementById('whatsappToggleBtn');
-        const dot = document.getElementById('whatsappDot');
-        const statusText = document.getElementById('whatsappStatusText');
-        const badge = document.getElementById('whatsappBadge');
-        
-        if (isWhatsAppActive) {
-            btn.textContent = '⏸️ Pause';
-            dot.className = 'dot active';
-            statusText.textContent = 'Active - New orders will be sent to WhatsApp';
-            badge.textContent = 'ON';
-            badge.style.background = '#25D366';
-            showToast('✅ WhatsApp notifications activated');
-        } else {
-            btn.textContent = '▶️ Resume';
-            dot.className = 'dot inactive';
-            statusText.textContent = 'Paused - Orders will be saved but no WhatsApp messages';
-            badge.textContent = 'OFF';
-            badge.style.background = '#ff4444';
-            showToast('⏸️ WhatsApp notifications paused');
-        }
-        
-        localStorage.setItem('whatsapp_active', JSON.stringify(isWhatsAppActive));
-    }
-
-    // Load WhatsApp Status
-    function loadWhatsAppStatus() {
-        try {
-            const saved = localStorage.getItem('whatsapp_active');
-            if (saved) {
-                isWhatsAppActive = JSON.parse(saved);
-                if (!isWhatsAppActive) {
-                    document.getElementById('whatsappToggleBtn').textContent = '▶️ Resume';
-                    document.getElementById('whatsappDot').className = 'dot inactive';
-                    document.getElementById('whatsappStatusText').textContent = 'Paused - Orders will be saved but no WhatsApp messages';
-                    document.getElementById('whatsappBadge').textContent = 'OFF';
-                    document.getElementById('whatsappBadge').style.background = '#ff4444';
-                }
-            }
-        } catch (e) {}
-    }
-
-    // ==========================================
-    // ORDER FUNCTIONS (with WhatsApp)
-    // ==========================================
-    function addOrder(orderData) {
-        const newOrder = {
-            id: 'ORD' + Date.now().toString().slice(-8),
-            ...orderData,
-            date: new Date().toLocaleString(),
-            status: 'processing'
-        };
-        
-        orders.unshift(newOrder);
-        saveOrders();
-        updateDashboard();
-        renderOrders();
-        updateBadges();
-        
-        // 🔥 Send WhatsApp Notification
-        if (isWhatsAppActive) {
-            setTimeout(() => sendWhatsApp(newOrder), 500);
-        }
-        
-        showToast('📦 New order placed!');
-        return newOrder;
-    }
-
-    // ==========================================
     // UPDATE DASHBOARD
     // ==========================================
     function updateDashboard() {
         const total = orders.length;
-        const revenue = orders.reduce((sum, o) => sum + o.total, 0);
+        const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
         const uniqueCustomers = new Set(orders.map(o => o.customerEmail)).size;
-        const avgRating = products.reduce((sum, p) => sum + (p.rating || 0), 0) / (products.length || 1);
-        const whatsappCount = whatsappLogs.length;
+        const pending = orders.filter(o => o.status === 'processing').length;
         
         document.getElementById('totalOrders').textContent = total;
         document.getElementById('totalRevenue').textContent = '₹' + revenue.toLocaleString();
         document.getElementById('totalCustomers').textContent = uniqueCustomers;
-        document.getElementById('avgRating').textContent = avgRating.toFixed(1);
-        document.getElementById('totalWhatsApp').textContent = whatsappCount;
+        document.getElementById('totalPending').textContent = pending;
         
         const recent = orders.slice(0, 5);
         const tbody = document.getElementById('recentOrders');
@@ -1522,83 +1353,68 @@ Status: {status}
             <tr>
                 <td><strong>${o.id}</strong></td>
                 <td>${o.customerName || 'Guest'}</td>
-                <td>₹${o.total.toLocaleString()}</td>
-                <td><span class="status-badge ${o.status}">${o.status.toUpperCase()}</span></td>
-                <td>${o.whatsappSent ? '✅ Sent' : '⏳ Pending'}</td>
-                <td>${o.date}</td>
+                <td>₹${(o.total || 0).toLocaleString()}</td>
+                <td><span class="status-badge ${o.status}">${(o.status || 'processing').toUpperCase()}</span></td>
+                <td>${o.date || 'N/A'}</td>
             </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No orders yet</td></tr>';
+        `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">📦 No orders yet</td></tr>';
     }
 
     // ==========================================
     // RENDER ORDERS
     // ==========================================
     function renderOrders() {
-        const filtered = currentOrders.filter(o => {
+        const filtered = orders.filter(o => {
             if (currentFilter === 'all') return true;
             return o.status === currentFilter;
         }).filter(o => {
             if (!currentSearch) return true;
             const search = currentSearch.toLowerCase();
-            return o.id.toLowerCase().includes(search) || 
+            return (o.id || '').toLowerCase().includes(search) || 
                    (o.customerName || '').toLowerCase().includes(search);
         });
         
         const tbody = document.getElementById('ordersTable');
+        if (!tbody) return;
+        
         tbody.innerHTML = filtered.map(o => `
             <tr>
-                <td><strong>${o.id}</strong></td>
+                <td><strong>${o.id || 'N/A'}</strong></td>
                 <td>${o.customerName || 'Guest'}</td>
                 <td>${o.customerPhone || 'N/A'}</td>
-                <td>${o.items.map(i => `${i.brand} ${i.name}`).join(', ')}</td>
-                <td>₹${o.total.toLocaleString()}</td>
+                <td style="font-size:11px;">${(o.items || []).map(i => `${i.brand || ''} ${i.name || ''}×${i.qty || 1}`).join(', ')}</td>
+                <td>₹${(o.total || 0).toLocaleString()}</td>
                 <td>
                     <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
-                        <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>Processing</option>
-                        <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>Shipped</option>
-                        <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                        <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>⏳ Processing</option>
+                        <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>📤 Shipped</option>
+                        <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
+                        <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
                     </select>
                 </td>
-                <td>${o.whatsappSent ? '✅ Sent' : '⏳ Pending'}</td>
-                <td>${o.date}</td>
+                <td>${o.date || 'N/A'}</td>
                 <td>
                     <button class="action-btn view" onclick="viewOrder('${o.id}')">👁️</button>
-                    <button class="action-btn whatsapp" onclick="sendWhatsAppFromOrder('${o.id}')">💬</button>
                     <button class="action-btn delete" onclick="deleteOrder('${o.id}')">🗑️</button>
                 </td>
             </tr>
-        `).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No orders found</td></tr>';
+        `).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:30px;">📦 No orders found</td></tr>';
         
         updateBadges();
-    }
-
-    function sendWhatsAppFromOrder(orderId) {
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
-            sendWhatsApp(order);
-            order.whatsappSent = true;
-            saveOrders();
-            renderOrders();
-        }
     }
 
     // ==========================================
     // UPDATE ORDER STATUS
     // ==========================================
-    function updateOrderStatus(orderId, status) {
+    async function updateOrderStatus(orderId, status) {
         const order = orders.find(o => o.id === orderId);
         if (order) {
             order.status = status;
-            saveOrders();
+            await saveOrdersToGitHub();
             renderOrders();
             updateDashboard();
-            showToast('✅ Order status updated to ' + status);
-            
-            // Send WhatsApp on status change
-            if (isWhatsAppActive && status === 'shipped' || status === 'delivered') {
-                sendWhatsApp(order);
-            }
+            updateBadges();
+            showToast('✅ Status updated to ' + status);
         }
     }
 
@@ -1617,19 +1433,15 @@ Status: {status}
                 <p><strong>Customer:</strong> ${order.customerName || 'Guest'}</p>
                 <p><strong>Email:</strong> ${order.customerEmail || 'N/A'}</p>
                 <p><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</p>
-                <p><strong>Date:</strong> ${order.date}</p>
-                <p><strong>Status:</strong> <span class="status-badge ${order.status}">${order.status.toUpperCase()}</span></p>
-                <p><strong>WhatsApp:</strong> ${order.whatsappSent ? '✅ Sent' : '⏳ Pending'}</p>
+                <p><strong>Date:</strong> ${order.date || 'N/A'}</p>
+                <p><strong>Status:</strong> <span class="status-badge ${order.status}">${(order.status || 'processing').toUpperCase()}</span></p>
                 <p><strong>Items:</strong></p>
-                <ul style="padding-left:20px;">
-                    ${order.items.map(i => `<li>${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}</li>`).join('')}
+                <ul style="padding-left:20px;margin:8px 0;">
+                    ${(order.items || []).map(i => `<li>${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}</li>`).join('')}
                 </ul>
-                <p><strong style="font-size:18px;">Total: ₹${order.total.toLocaleString()}</strong></p>
+                <p><strong style="font-size:18px;">Total: ₹${(order.total || 0).toLocaleString()}</strong></p>
             </div>
-            <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
-                <button class="btn-whatsapp" onclick="sendWhatsAppFromOrder('${order.id}'); closeModal();">💬 Send WhatsApp</button>
-                <button class="btn-submit" onclick="closeModal()">Close</button>
-            </div>
+            <button class="btn-secondary" onclick="closeModal()" style="width:100%;padding:14px;border:2px solid #ff3f6c;border-radius:14px;background:transparent;color:#ff3f6c;font-weight:600;cursor:pointer;margin-top:8px;">Close</button>
         `;
         openModal(html);
     }
@@ -1637,10 +1449,10 @@ Status: {status}
     // ==========================================
     // DELETE ORDER
     // ==========================================
-    function deleteOrder(orderId) {
+    async function deleteOrder(orderId) {
         if (!confirm('Delete order ' + orderId + '?')) return;
         orders = orders.filter(o => o.id !== orderId);
-        saveOrders();
+        await saveOrdersToGitHub();
         renderOrders();
         updateDashboard();
         updateBadges();
@@ -1653,7 +1465,7 @@ Status: {status}
     function filterOrders(status) {
         currentFilter = status;
         document.querySelectorAll('#orderTabs .tab-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
+        if (event && event.target) event.target.classList.add('active');
         renderOrders();
     }
 
@@ -1685,17 +1497,11 @@ Status: {status}
     // ==========================================
     function renderProducts() {
         const tbody = document.getElementById('productsTable');
-        const search = document.getElementById('productSearch')?.value?.toLowerCase() || '';
+        if (!tbody) return;
         
-        const filtered = products.filter(p => {
-            if (!search) return true;
-            return p.name.toLowerCase().includes(search) || 
-                   p.brand.toLowerCase().includes(search);
-        });
-        
-        tbody.innerHTML = filtered.map(p => `
+        tbody.innerHTML = products.map(p => `
             <tr>
-                <td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
+                <td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;" onerror="this.src='https://via.placeholder.com/50'"></td>
                 <td><strong>${p.brand}</strong></td>
                 <td>${p.name}</td>
                 <td><span style="background:var(--input-bg);padding:2px 10px;border-radius:20px;font-size:11px;">${p.category}</span></td>
@@ -1706,7 +1512,7 @@ Status: {status}
                     <button class="action-btn delete" onclick="deleteProduct(${p.id})">🗑️</button>
                 </td>
             </tr>
-        `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No products added</td></tr>';
+        `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px;">👟 No products added</td></tr>';
     }
 
     function searchProducts(query) {
@@ -1810,6 +1616,8 @@ Status: {status}
     // ==========================================
     function renderCustomers() {
         const tbody = document.getElementById('customersTable');
+        if (!tbody) return;
+        
         const customerMap = new Map();
         
         orders.forEach(o => {
@@ -1826,7 +1634,7 @@ Status: {status}
             }
             const c = customerMap.get(email);
             c.orders += 1;
-            c.total += o.total;
+            c.total += (o.total || 0);
         });
         
         const customersList = Array.from(customerMap.values());
@@ -1840,29 +1648,14 @@ Status: {status}
                 <td>₹${c.total.toLocaleString()}</td>
                 <td>${c.joined}</td>
             </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No customers yet</td></tr>';
-    }
-
-    // ==========================================
-    // SETTINGS
-    // ==========================================
-    function saveSettings() {
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-        const storeName = document.getElementById('storeName').value;
-        
-        if (email) ADMIN_CREDENTIALS.email = email;
-        if (password) ADMIN_CREDENTIALS.password = password;
-        
-        localStorage.setItem('jmd_store_name', storeName);
-        showToast('✅ Settings saved!');
+        `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:30px;">👤 No customers yet</td></tr>';
     }
 
     // ==========================================
     // SWITCH TABS
     // ==========================================
     function switchTab(tab) {
-        ['Dashboard', 'Orders', 'Products', 'Whatsapp', 'Customers', 'Settings'].forEach(t => {
+        ['Dashboard', 'Orders', 'Products', 'Customers', 'Settings'].forEach(t => {
             const el = document.getElementById('tab' + t);
             if (el) el.style.display = 'none';
         });
@@ -1884,10 +1677,6 @@ Status: {status}
         if (tab === 'products') renderProducts();
         if (tab === 'customers') renderCustomers();
         if (tab === 'dashboard') updateDashboard();
-        if (tab === 'whatsapp') {
-            loadWhatsAppSettings();
-            updateWhatsAppLogs();
-        }
         
         closeSidebar();
     }
@@ -1943,14 +1732,6 @@ Status: {status}
     }
 
     // ==========================================
-    // EXPOSE FUNCTIONS TO GLOBAL SCOPE
-    // ==========================================
-    window.sendWhatsApp = sendWhatsApp;
-    window.testWhatsApp = testWhatsApp;
-    window.sendWhatsAppFromOrder = sendWhatsAppFromOrder;
-    window.addOrder = addOrder;
-
-    // ==========================================
     // INIT
     // ==========================================
     if (localStorage.getItem('admin_darkmode') === 'true') {
@@ -1958,12 +1739,7 @@ Status: {status}
         document.querySelector('.admin-toggle').textContent = '☀️';
     }
 
-    loadWhatsAppStatus();
     initAdmin();
-
-    console.log('🔥 Admin Panel + WhatsApp Ready!');
-    console.log('💬 WhatsApp Status:', isWhatsAppActive ? 'Active' : 'Paused');
-    console.log('📱 Admin Number:', WHATSAPP_CONFIG.adminNumber);
     </script>
 </body>
 </html>
