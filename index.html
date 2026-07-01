@@ -1,1969 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JMD Boot House - Admin Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --bg-primary: #f0f2f5;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #111111;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --border-color: #e8e8e8;
-            --shadow-color: rgba(0,0,0,0.04);
-            --shadow-hover: rgba(0,0,0,0.08);
-            --input-bg: #f5f5f7;
-            --modal-bg: #ffffff;
-            --nav-bg: #ffffff;
-            --sidebar-bg: #1a1a2e;
-            --sidebar-text: #ffffff;
-            --sidebar-hover: #2d2d44;
-            --whatsapp-green: #25D366;
-            --whatsapp-green-dark: #128C7E;
-        }
-
-        body.dark-mode {
-            --bg-primary: #0a0a1a;
-            --bg-secondary: #12122a;
-            --bg-card: #1a1a3e;
-            --text-primary: #f0f0f0;
-            --text-secondary: #aaaaaa;
-            --text-muted: #666666;
-            --border-color: #2a2a4e;
-            --shadow-color: rgba(255,255,255,0.02);
-            --shadow-hover: rgba(255,255,255,0.05);
-            --input-bg: #1a1a3e;
-            --modal-bg: #12122a;
-            --nav-bg: #12122a;
-            --sidebar-bg: #0a0a1a;
-            --sidebar-hover: #1a1a3e;
-        }
-
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-
-        /* ===== ADMIN LAYOUT ===== */
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            min-height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-        }
-
-        .sidebar-brand {
-            padding: 24px 20px;
-            font-size: 24px;
-            font-weight: 900;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            cursor: pointer;
-        }
-
-        .sidebar-brand .jmd {
-            color: #ff3f6c;
-        }
-
-        .sidebar-brand .boot {
-            color: #ff6b00;
-        }
-
-        .sidebar-brand small {
-            display: block;
-            font-size: 11px;
-            font-weight: 400;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
-        }
-
-        .sidebar-menu {
-            padding: 16px 0;
-        }
-
-        .sidebar-item {
-            padding: 14px 24px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-            text-decoration: none;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .sidebar-item:hover {
-            background: var(--sidebar-hover);
-            color: #fff;
-        }
-
-        .sidebar-item.active {
-            background: var(--sidebar-hover);
-            border-left-color: #ff3f6c;
-            color: #fff;
-        }
-
-        .sidebar-item .icon {
-            font-size: 20px;
-            width: 24px;
-        }
-
-        .sidebar-item .badge {
-            margin-left: auto;
-            background: #ff3f6c;
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .sidebar-item .badge.whatsapp {
-            background: #25D366;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 24px 30px 100px;
-        }
-
-        /* ===== TOP HEADER ===== */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .page-title {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .admin-toggle {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.3s;
-            color: var(--text-primary);
-        }
-
-        .admin-toggle:hover {
-            background: var(--input-bg);
-        }
-
-        /* ===== WHATSAPP STATUS BAR ===== */
-        .whatsapp-status {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .whatsapp-status .status {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .whatsapp-status .status .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .whatsapp-status .status .dot.active {
-            background: #25D366;
-            animation: pulse 2s infinite;
-        }
-
-        .whatsapp-status .status .dot.inactive {
-            background: #ff4444;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .whatsapp-status .status .label {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .whatsapp-status .status .sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .whatsapp-status .actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-whatsapp {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 12px;
-            background: #25D366;
-            color: #fff;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-whatsapp:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.3);
-        }
-
-        .btn-whatsapp-secondary {
-            padding: 10px 24px;
-            border: 2px solid #25D366;
-            border-radius: 12px;
-            background: transparent;
-            color: #25D366;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-whatsapp-secondary:hover {
-            background: #25D366;
-            color: #fff;
-        }
-
-        /* ===== STATS CARDS ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 18px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            padding: 20px 24px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px var(--shadow-color);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card .icon-big {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-top: 4px;
-        }
-
-        .stat-card .change {
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-
-        .stat-card .change.up { color: #00b894; }
-        .stat-card .change.down { color: #ff3f6c; }
-
-        .stat-card .whatsapp-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #25D366;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        /* ===== TABLE ===== */
-        .table-container {
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            box-shadow: 0 2px 10px var(--shadow-color);
-        }
-
-        .table-header {
-            padding: 18px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .table-header h3 {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .table-header .filters {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .table-search {
-            padding: 8px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--input-bg);
-            font-size: 13px;
-            color: var(--text-primary);
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .table-search:focus {
-            border-color: #ff3f6c;
-            box-shadow: 0 0 0 4px rgba(255,63,108,0.1);
-        }
-
-        .table-scroll {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th {
-            text-align: left;
-            padding: 14px 18px;
-            background: var(--input-bg);
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        td {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        tr:hover td {
-            background: var(--input-bg);
-        }
-
-        .status-badge {
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-badge.processing {
-            background: #ff3f6c20;
-            color: #ff3f6c;
-        }
-        .status-badge.shipped {
-            background: #f59e0b20;
-            color: #f59e0b;
-        }
-        .status-badge.delivered {
-            background: #00b89420;
-            color: #00b894;
-        }
-        .status-badge.cancelled {
-            background: #ff444420;
-            color: #ff4444;
-        }
-
-        .status-select {
-            padding: 4px 10px;
-            border-radius: 8px;
-            border: 2px solid var(--border-color);
-            background: var(--bg-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-
-        .status-select:focus {
-            outline: none;
-            border-color: #ff3f6c;
-        }
-
-        .action-btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .action-btn.view {
-            background: #ff3f6c20;
-            color: #ff3f6c;
-        }
-
-        .action-btn.view:hover {
-            background: #ff3f6c;
-            color: #fff;
-        }
-
-        .action-btn.delete {
-            background: #ff444420;
-            color: #ff4444;
-        }
-
-        .action-btn.delete:hover {
-            background: #ff4444;
-            color: #fff;
-        }
-
-        .action-btn.whatsapp {
-            background: #25D36620;
-            color: #25D366;
-        }
-
-        .action-btn.whatsapp:hover {
-            background: #25D366;
-            color: #fff;
-        }
-
-        /* ===== TABS ===== */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--input-bg);
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 10px;
-            background: transparent;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--text-secondary);
-        }
-
-        .tab-btn.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: 0 2px 10px var(--shadow-color);
-        }
-
-        .tab-btn:hover:not(.active) {
-            background: var(--bg-card);
-        }
-
-        .tab-btn .count {
-            background: var(--input-bg);
-            padding: 0 8px;
-            border-radius: 10px;
-            font-size: 11px;
-        }
-
-        .tab-btn.active .count {
-            background: #ff3f6c;
-            color: #fff;
-        }
-
-        /* ===== PRODUCT FORM ===== */
-        .product-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            background: var(--bg-card);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 24px;
-        }
-
-        .product-form .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .product-form label {
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .product-form input, .product-form select {
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--input-bg);
-            font-size: 14px;
-            color: var(--text-primary);
-            outline: none;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        .product-form input:focus, .product-form select:focus {
-            border-color: #ff3f6c;
-            box-shadow: 0 0 0 4px rgba(255,63,108,0.1);
-        }
-
-        .product-form .btn-submit {
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #ff3f6c, #ff6b8a);
-            color: #fff;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .product-form .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255,63,108,0.3);
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            padding: 14px 28px;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 9999;
-            display: none;
-            animation: slideUp 0.4s ease;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            max-width: 400px;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            z-index: 5000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--modal-bg);
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            border-radius: 28px;
-            padding: 30px;
-            overflow-y: auto;
-            animation: modalSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid var(--border-color);
-        }
-
-        @keyframes modalSlide {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-close {
-            float: right;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            font-size: 22px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .modal-close:hover {
-            background: var(--border-color);
-            transform: rotate(90deg);
-        }
-
-        .modal .whatsapp-message {
-            background: var(--input-bg);
-            padding: 16px;
-            border-radius: 12px;
-            margin: 12px 0;
-            font-family: monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            border-left: 4px solid #25D366;
-        }
-
-        /* ===== HAMBURGER ===== */
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.show {
-            display: block;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 16px;
-            }
-            
-            .hamburger {
-                display: block;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .product-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .product-form .full-width {
-                grid-column: 1;
-            }
-            
-            .top-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .whatsapp-status {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .whatsapp-status .actions {
-                width: 100%;
-            }
-            
-            .whatsapp-status .actions button {
-                flex: 1;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tabs {
-                flex-wrap: wrap;
-            }
-            
-            .tab-btn {
-                flex: 1;
-                text-align: center;
-                padding: 8px 12px;
-                font-size: 11px;
-            }
-
-            .table-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JMD Boot House - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+:root{--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#666;--border:#e8e8e8;--input:#f5f5f7}
+body.dark-mode{--bg:#0a0a1a;--card:#1a1a3e;--text:#f0f0f0;--text2:#aaa;--border:#2a2a4e;--input:#1a1a3e}
+body{background:var(--bg);color:var(--text)}
+
+/* LOGIN */
+.login-container{max-width:400px;margin:80px auto;padding:40px;background:var(--card);border-radius:28px;border:1px solid var(--border)}
+.login-container h2{margin-bottom:20px}
+.login-container input{width:100%;padding:14px;border:2px solid var(--border);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input);color:var(--text)}
+.login-container button{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,#ff3f6c,#ff6b8a);color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+
+/* ADMIN */
+.admin-header{padding:16px 24px;background:var(--card);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.admin-header h1{font-size:22px}
+.admin-header .j{color:#ff3f6c}
+.admin-header .b{color:#ff6b00}
+.admin-header .logout{background:none;border:none;color:#ff3f6c;font-weight:600;cursor:pointer;font-size:14px}
+
+.admin-content{padding:20px 24px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat{background:var(--card);padding:18px 20px;border-radius:16px;border:1px solid var(--border)}
+.stat .num{font-size:28px;font-weight:800}
+.stat .lbl{font-size:13px;color:var(--text2)}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.tabs button{padding:8px 20px;border:none;border-radius:10px;background:var(--input);font-weight:600;font-size:12px;cursor:pointer;color:var(--text2)}
+.tabs button.active{background:var(--card);color:#ff3f6c;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;font-size:13px;border-collapse:collapse}
+th{text-align:left;padding:12px 14px;background:var(--input);font-weight:600;color:var(--text2)}
+td{padding:12px 14px;border-bottom:1px solid var(--border)}
+.status-badge{padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600}
+.status-badge.processing{background:#ff3f6c20;color:#ff3f6c}
+.status-badge.shipped{background:#f59e0b20;color:#f59e0b}
+.status-badge.delivered{background:#00b89420;color:#00b894}
+.status-badge.cancelled{background:#ff444420;color:#ff4444}
+.status-select{padding:4px 10px;border-radius:8px;border:2px solid var(--border);background:var(--card);font-size:11px;font-weight:600;cursor:pointer;color:var(--text)}
+.action-btn{padding:4px 12px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:11px}
+.action-btn.view{background:#ff3f6c20;color:#ff3f6c}
+.action-btn.view:hover{background:#ff3f6c;color:#fff}
+.action-btn.del{background:#ff444420;color:#ff4444}
+.action-btn.del:hover{background:#ff4444;color:#fff}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:5000;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);width:90%;max-width:500px;max-height:80vh;border-radius:28px;padding:30px;overflow-y:auto;border:1px solid var(--border)}
+.modal-close{float:right;width:40px;height:40px;border-radius:50%;border:none;background:var(--input);font-size:22px;cursor:pointer}
+.btn-secondary{width:100%;padding:14px;border:2px solid #ff3f6c;border-radius:14px;background:transparent;color:#ff3f6c;font-weight:600;cursor:pointer;margin-top:8px}
+
+.toast{position:fixed;bottom:30px;right:30px;background:var(--card);color:var(--text);padding:14px 28px;border-radius:16px;font-size:14px;font-weight:500;z-index:9999;display:none;box-shadow:0 10px 50px rgba(0,0,0,0.2);border:1px solid var(--border)}
+</style>
 </head>
 <body>
 
-    <!-- ===== ADMIN CONTAINER ===== -->
-    <div class="admin-container">
+<!-- LOGIN -->
+<div id="loginPage" class="login-container">
+<h2>🔐 Admin Login</h2>
+<label style="font-weight:600;font-size:13px;color:var(--text2)">Email</label>
+<input type="email" id="loginEmail" value="admin@jmdboot.com">
+<label style="font-weight:600;font-size:13px;color:var(--text2)">Password</label>
+<input type="password" id="loginPassword" value="admin123">
+<button onclick="adminLogin()">Sign In</button>
+<p style="margin-top:12px;font-size:12px;color:var(--text2);text-align:center;">Default: admin@jmdboot.com / admin123</p>
+</div>
 
-        <!-- ===== SIDEBAR ===== -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <span class="jmd">JMD</span><span class="boot">BOOT</span>
-                <small>Admin Panel v2.0</small>
-            </div>
-            <div class="sidebar-menu">
-                <div class="sidebar-item active" onclick="switchTab('dashboard')">
-                    <span class="icon">📊</span> Dashboard
-                </div>
-                <div class="sidebar-item" onclick="switchTab('orders')">
-                    <span class="icon">📦</span> Orders
-                    <span class="badge" id="orderBadge">0</span>
-                </div>
-                <div class="sidebar-item" onclick="switchTab('products')">
-                    <span class="icon">👟</span> Products
-                </div>
-                <div class="sidebar-item" onclick="switchTab('whatsapp')">
-                    <span class="icon">💬</span> WhatsApp
-                    <span class="badge whatsapp" id="whatsappBadge">ON</span>
-                </div>
-                <div class="sidebar-item" onclick="switchTab('customers')">
-                    <span class="icon">👤</span> Customers
-                </div>
-                <div class="sidebar-item" onclick="switchTab('settings')">
-                    <span class="icon">⚙️</span> Settings
-                </div>
-                <div class="sidebar-item" onclick="logoutAdmin()">
-                    <span class="icon">🚪</span> Logout
-                </div>
-            </div>
-        </div>
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none;">
+<div class="admin-header">
+<h1><span class="j">JMD</span><span class="b">BOOT</span> <span style="font-size:14px;font-weight:400;color:var(--text2)">Admin</span></h1>
+<button class="logout" onclick="adminLogout()">🚪 Logout</button>
+</div>
 
-        <!-- ===== OVERLAY ===== -->
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="admin-content">
+<div class="stats" id="stats">
+<div class="stat"><div class="num" id="statOrders">0</div><div class="lbl">📦 Total Orders</div></div>
+<div class="stat"><div class="num" id="statRevenue">₹0</div><div class="lbl">💰 Revenue</div></div>
+<div class="stat"><div class="num" id="statCustomers">0</div><div class="lbl">👥 Customers</div></div>
+<div class="stat"><div class="num" id="statPending">0</div><div class="lbl">⏳ Pending</div></div>
+</div>
 
-        <!-- ===== MAIN CONTENT ===== -->
-        <div class="main-content" id="mainContent">
+<div class="tabs">
+<button class="active" onclick="filterOrders('all',this)">📦 All</button>
+<button onclick="filterOrders('processing',this)">⏳ Processing</button>
+<button onclick="filterOrders('shipped',this)">📤 Shipped</button>
+<button onclick="filterOrders('delivered',this)">✅ Delivered</button>
+<button onclick="filterOrders('cancelled',this)">❌ Cancelled</button>
+</div>
 
-            <!-- ===== TOP HEADER ===== -->
-            <div class="top-header">
-                <div style="display:flex;align-items:center;gap:16px;">
-                    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
-                </div>
-                <div class="header-actions">
-                    <span style="font-size:13px;color:var(--text-secondary);" id="adminUser">👤 Admin</span>
-                    <button class="admin-toggle" onclick="toggleDarkMode()">🌙</button>
-                    <button class="admin-toggle" onclick="window.open('index.html', '_blank')" title="View Store">🏪</button>
-                </div>
-            </div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Order ID</th><th>Customer</th><th>Phone</th><th>Items</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+<tbody id="ordersTable"></tbody>
+</table>
+</div>
+</div>
+</div>
 
-            <!-- ===== WHATSAPP STATUS BAR ===== -->
-            <div class="whatsapp-status" id="whatsappStatusBar">
-                <div class="status">
-                    <span class="dot active" id="whatsappDot"></span>
-                    <div>
-                        <div class="label">💬 WhatsApp Notifications</div>
-                        <div class="sub" id="whatsappStatusText">Active - New orders will be sent to WhatsApp</div>
-                    </div>
-                </div>
-                <div class="actions">
-                    <button class="btn-whatsapp" onclick="testWhatsApp()">📱 Test Message</button>
-                    <button class="btn-whatsapp-secondary" onclick="toggleWhatsApp()" id="whatsappToggleBtn">⏸️ Pause</button>
-                </div>
-            </div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-            <!-- ===== DASHBOARD ===== -->
-            <div id="tabDashboard">
-                <div class="stats-grid" id="statsGrid">
-                    <div class="stat-card">
-                        <div class="icon-big">📦</div>
-                        <div class="label">Total Orders</div>
-                        <div class="value" id="totalOrders">0</div>
-                        <div class="change up">↑ 12% this month</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="icon-big">💰</div>
-                        <div class="label">Revenue</div>
-                        <div class="value" id="totalRevenue">₹0</div>
-                        <div class="change up">↑ 8% this month</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="icon-big">👥</div>
-                        <div class="label">Customers</div>
-                        <div class="value" id="totalCustomers">0</div>
-                        <div class="change up">↑ 5% this month</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="icon-big">💬</div>
-                        <div class="label">WhatsApp Sent</div>
-                        <div class="value" id="totalWhatsApp">0</div>
-                        <div class="whatsapp-badge">📱 Active</div>
-                    </div>
-                </div>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modalContent"></div></div>
 
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>📋 Recent Orders</h3>
-                        <button class="action-btn view" onclick="switchTab('orders')">View All</button>
-                    </div>
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>WhatsApp</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentOrders"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<script>
+// ==========================================
+// 🔥 GITHUB SETUP - SAME AS STORE 🔥
+// ==========================================
+const GITHUB = {
+    owner: 'robotekpvt-sys',
+    repo: 'jmd-boot-store',
+    token: 'ghp_xxxxxxxxxxxx',
+    branch: 'main'
+};
 
-            <!-- ===== ORDERS TAB ===== -->
-            <div id="tabOrders" style="display:none;">
-                <div class="tabs" id="orderTabs">
-                    <button class="tab-btn active" onclick="filterOrders('all')">All <span class="count" id="countAll">0</span></button>
-                    <button class="tab-btn" onclick="filterOrders('processing')">Processing <span class="count" id="countProcessing">0</span></button>
-                    <button class="tab-btn" onclick="filterOrders('shipped')">Shipped <span class="count" id="countShipped">0</span></button>
-                    <button class="tab-btn" onclick="filterOrders('delivered')">Delivered <span class="count" id="countDelivered">0</span></button>
-                    <button class="tab-btn" onclick="filterOrders('cancelled')">Cancelled <span class="count" id="countCancelled">0</span></button>
-                </div>
-                
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>📦 All Orders</h3>
-                        <div class="filters">
-                            <input class="table-search" type="text" placeholder="Search orders..." oninput="searchOrders(this.value)">
-                        </div>
-                    </div>
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer</th>
-                                    <th>Phone</th>
-                                    <th>Items</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>WhatsApp</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ordersTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+// ==========================================
+// ADMIN CREDENTIALS
+// ==========================================
+const ADMIN = {
+    email: 'admin@jmdboot.com',
+    password: 'admin123'
+};
 
-            <!-- ===== PRODUCTS TAB ===== -->
-            <div id="tabProducts" style="display:none;">
-                <div class="product-form" id="productForm">
-                    <div class="full-width"><h3 style="margin-bottom:12px;">➕ Add New Product</h3></div>
-                    <div><label>Brand</label><input type="text" id="prodBrand" placeholder="Nike"></div>
-                    <div><label>Name</label><input type="text" id="prodName" placeholder="Air Max"></div>
-                    <div>
-                        <label>Category</label>
-                        <select id="prodCategory">
-                            <option value="sneakers">Sneakers</option>
-                            <option value="running">Running</option>
-                            <option value="boots">Boots</option>
-                            <option value="casual">Casual</option>
-                        </select>
-                    </div>
-                    <div><label>Image URL</label><input type="text" id="prodImage" placeholder="https://..."></div>
-                    <div><label>Price (₹)</label><input type="number" id="prodPrice" placeholder="3999"></div>
-                    <div><label>Old Price (₹)</label><input type="number" id="prodOldPrice" placeholder="7999"></div>
-                    <div><label>Rating</label><input type="number" id="prodRating" placeholder="4.8" step="0.1"></div>
-                    <div><label>Reviews</label><input type="number" id="prodReviews" placeholder="245"></div>
-                    <div>
-                        <label>Badge</label>
-                        <select id="prodBadge">
-                            <option value="NEW">NEW</option>
-                            <option value="HOT">HOT</option>
-                            <option value="SALE">SALE</option>
-                            <option value="BEST">BEST</option>
-                            <option value="TRENDING">TRENDING</option>
-                        </select>
-                    </div>
-                    <div class="full-width">
-                        <button class="btn-submit" onclick="addProduct()">➕ Add Product</button>
-                    </div>
-                </div>
+let orders = [];
+let filterStatus = 'all';
 
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>👟 All Products</h3>
-                        <input class="table-search" type="text" placeholder="Search products..." oninput="searchProducts(this.value)">
-                    </div>
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Image</th>
-                                    <th>Brand</th>
-                                    <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Rating</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== WHATSAPP TAB ===== -->
-            <div id="tabWhatsapp" style="display:none;">
-                <div class="table-container" style="padding:24px;">
-                    <h3 style="margin-bottom:16px;">💬 WhatsApp Notification Settings</h3>
-                    
-                    <div style="display:grid;gap:16px;max-width:600px;">
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">📱 Admin WhatsApp Number</label>
-                            <input type="text" id="adminWhatsApp" value="+919999999999" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
-                            <small style="color:var(--text-muted);font-size:11px;">Include country code (e.g., +91 for India)</small>
-                        </div>
-
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">📝 WhatsApp Message Template</label>
-                            <textarea id="whatsappTemplate" rows="6" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:13px;color:var(--text-primary);outline:none;margin-top:4px;font-family:monospace;">🛍️ *New Order!*
-
-Order ID: {orderId}
-Customer: {customer}
-Phone: {phone}
-Total: ₹{total}
-
-Items:
-{items}
-
-Status: {status}
-
-📦 Thank you for shopping at JMD BOOT HOUSE!</textarea>
-                            <small style="color:var(--text-muted);font-size:11px;">Use {orderId}, {customer}, {phone}, {total}, {items}, {status} as placeholders</small>
-                        </div>
-
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                            <button class="btn-whatsapp" onclick="saveWhatsAppSettings()">💾 Save Settings</button>
-                            <button class="btn-whatsapp-secondary" onclick="sendTestMessage()">📱 Send Test Message</button>
-                        </div>
-
-                        <div style="margin-top:16px;padding:16px;background:var(--input-bg);border-radius:12px;border-left:4px solid #25D366;">
-                            <h4>📋 Recent WhatsApp Logs</h4>
-                            <div id="whatsappLogs" style="margin-top:8px;font-size:12px;max-height:200px;overflow-y:auto;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== CUSTOMERS TAB ===== -->
-            <div id="tabCustomers" style="display:none;">
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>👤 Registered Customers</h3>
-                    </div>
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Orders</th>
-                                    <th>Total Spent</th>
-                                    <th>Joined</th>
-                                </tr>
-                            </thead>
-                            <tbody id="customersTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== SETTINGS TAB ===== -->
-            <div id="tabSettings" style="display:none;">
-                <div class="table-container" style="padding:24px;">
-                    <h3 style="margin-bottom:16px;">⚙️ Admin Settings</h3>
-                    <div style="display:grid;gap:12px;max-width:500px;">
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">Admin Email</label>
-                            <input type="email" id="adminEmail" value="admin@jmdboot.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
-                        </div>
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">New Password</label>
-                            <input type="password" id="adminPassword" placeholder="Enter new password" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
-                        </div>
-                        <div>
-                            <label style="font-weight:600;font-size:13px;">Store Name</label>
-                            <input type="text" id="storeName" value="JMD BOOT HOUSE" style="width:100%;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:14px;color:var(--text-primary);outline:none;margin-top:4px;">
-                        </div>
-                        <button class="btn-submit" onclick="saveSettings()" style="max-width:200px;">💾 Save Settings</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ===== TOAST ===== -->
-    <div class="toast" id="toast"></div>
-
-    <!-- ===== MODAL ===== -->
-    <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
-        <div class="modal" id="modalContent"></div>
-    </div>
-
-    <script>
-    // ==========================================
-    // 🔥 GITHUB CONFIGURATION
-    // ==========================================
-    const GITHUB_CONFIG = {
-        owner: 'YOUR_GITHUB_USERNAME',  // 🔥 CHANGE THIS
-        repo: 'YOUR_REPO_NAME',          // 🔥 CHANGE THIS
-        token: 'ghp_xxxxxxxxxxxxxxxxxxxx', // 🔥 CHANGE THIS
-        branch: 'main'
-    };
-
-    const GITHUB_API = {
-        rawOrders: `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/orders.json`,
-        updateOrders: `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/orders.json`
-    };
-
-    // ==========================================
-    // 🔥 WHATSAPP CONFIGURATION
-    // ==========================================
-    // 🔥 YAHAN APNA WHATSAPP NUMBER DAALO 🔥
-    const WHATSAPP_CONFIG = {
-        adminNumber: '+919999999999', // Change to your number
-        isActive: true,
-        template: `🛍️ *New Order!*
-
-Order ID: {orderId}
-Customer: {customer}
-Phone: {phone}
-Total: ₹{total}
-
-Items:
-{items}
-
-Status: {status}
-
-📦 Thank you for shopping at JMD BOOT HOUSE!`
-    };
-
-    // ==========================================
-    // STATE
-    // ==========================================
-    let orders = [];
-    let products = [];
-    let customers = [];
-    let currentOrders = [];
-    let currentFilter = 'all';
-    let currentSearch = '';
-    let whatsappLogs = [];
-    let isWhatsAppActive = true;
-
-    // ==========================================
-    // ADMIN CREDENTIALS
-    // ==========================================
-    const ADMIN_CREDENTIALS = {
-        email: 'admin@jmdboot.com',
-        password: 'admin123'
-    };
-
-    // ==========================================
-    // INIT ADMIN PANEL
-    // ==========================================
-    function initAdmin() {
-        const loggedIn = sessionStorage.getItem('adminLoggedIn');
-        if (loggedIn !== 'true') {
-            showAdminLogin();
-            return;
-        }
-        
-        loadData();
-        updateDashboard();
-        renderOrders();
-        renderProducts();
-        renderCustomers();
-        updateBadges();
-        loadWhatsAppSettings();
+// ==========================================
+// LOGIN
+// ==========================================
+function adminLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPassword').value;
+    if(email === ADMIN.email && pass === ADMIN.password) {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadOrders();
+        toast('✅ Welcome Admin!');
+    } else {
+        toast('❌ Invalid credentials!');
     }
+}
 
-    // ==========================================
-    // ADMIN LOGIN
-    // ==========================================
-    function showAdminLogin() {
-        const html = `
-            <h2 style="margin-bottom:16px;">🔐 Admin Login</h2>
-            <label>Email</label>
-            <input type="email" id="loginEmail" value="admin@jmdboot.com" style="width:100%;padding:12px;border:2px solid var(--border-color);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);">
-            <label>Password</label>
-            <input type="password" id="loginPassword" value="admin123" style="width:100%;padding:12px;border:2px solid var(--border-color);border-radius:12px;margin:4px 0 12px;font-size:14px;background:var(--input-bg);color:var(--text-primary);">
-            <button class="btn-submit" onclick="adminLogin()">Sign In</button>
-        `;
-        document.getElementById('mainContent').innerHTML = `<div style="max-width:400px;margin:60px auto;">${html}</div>`;
-    }
+function adminLogout() {
+    document.getElementById('loginPage').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    toast('👋 Logged out');
+}
 
-    function adminLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const pass = document.getElementById('loginPassword').value;
-        
-        if (email === ADMIN_CREDENTIALS.email && pass === ADMIN_CREDENTIALS.password) {
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            showToast('✅ Welcome Admin!');
-            location.reload();
+// ==========================================
+// LOAD ORDERS
+// ==========================================
+async function loadOrders() {
+    try {
+        const res = await fetch(`https://raw.githubusercontent.com/${GITHUB.owner}/${GITHUB.repo}/${GITHUB.branch}/orders.json?t=${Date.now()}`);
+        if(res.ok) {
+            orders = await res.json();
         } else {
-            showToast('❌ Invalid credentials!');
+            orders = JSON.parse(localStorage.getItem('jmd_orders')) || [];
         }
+    } catch(e) {
+        orders = JSON.parse(localStorage.getItem('jmd_orders')) || [];
     }
+    renderOrders();
+    updateStats();
+}
 
-    function logoutAdmin() {
-        sessionStorage.removeItem('adminLoggedIn');
-        showToast('👋 Logged out');
-        location.reload();
-    }
-
-    // ==========================================
-    // LOAD DATA
-    // ==========================================
-    function loadData() {
-        try {
-            const savedOrders = localStorage.getItem('jmd_orders');
-            const savedProducts = localStorage.getItem('jmd_admin_products');
-            const savedCustomers = localStorage.getItem('jmd_customers');
-            
-            if (savedOrders) orders = JSON.parse(savedOrders);
-            if (savedProducts) products = JSON.parse(savedProducts);
-            if (savedCustomers) customers = JSON.parse(savedCustomers);
-        } catch (e) {}
-        
-        if (products.length === 0) {
-            products = [
-                { id: 1, brand: "Nike", name: "Air Max Premium", category: "sneakers", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=900&auto=format&fit=crop", price: 3999, oldPrice: 7999, rating: 4.8, reviews: 245, badge: "NEW" },
-                { id: 2, brand: "Adidas", name: "Ultraboost Running", category: "running", image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=900&auto=format&fit=crop", price: 2499, oldPrice: 5999, rating: 4.7, reviews: 189, badge: "HOT" },
-                { id: 3, brand: "Puma", name: "Leather Boots", category: "boots", image: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?q=80&w=900&auto=format&fit=crop", price: 4299, oldPrice: 8999, rating: 4.6, reviews: 132, badge: "TRENDING" }
-            ];
-            saveProducts();
-        }
-        
-        currentOrders = [...orders];
-    }
-
-    function saveOrders() {
+// ==========================================
+// SAVE TO GITHUB
+// ==========================================
+async function saveOrdersToGitHub() {
+    try {
+        const url = `https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/orders.json`;
+        const get = await fetch(url, { headers: { 'Authorization': `token ${GITHUB.token}` } });
+        let sha = null;
+        if(get.ok) { const d = await get.json(); sha = d.sha; }
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${GITHUB.token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: `Update orders`,
+                content: btoa(JSON.stringify(orders, null, 2)),
+                sha: sha,
+                branch: GITHUB.branch
+            })
+        });
         localStorage.setItem('jmd_orders', JSON.stringify(orders));
-        // Also try to save to GitHub
-        saveToGitHub('orders.json', orders);
+    } catch(e) { console.log('⚠️ GitHub save failed'); }
+}
+
+// ==========================================
+// RENDER ORDERS
+// ==========================================
+function renderOrders() {
+    const tbody = document.getElementById('ordersTable');
+    let filtered = orders;
+    if(filterStatus !== 'all') {
+        filtered = orders.filter(o => o.status === filterStatus);
     }
-
-    function saveProducts() {
-        localStorage.setItem('jmd_admin_products', JSON.stringify(products));
+    if(!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">📦 No orders found</td></tr>';
+        return;
     }
+    tbody.innerHTML = filtered.map(o => `
+        <tr>
+            <td><strong>${o.id}</strong></td>
+            <td>${o.customer}</td>
+            <td>${o.phone}</td>
+            <td style="font-size:11px;">${o.items.map(i => `${i.brand} ${i.name}×${i.qty}`).join(', ')}</td>
+            <td><strong>₹${o.total.toLocaleString()}</strong></td>
+            <td>
+                <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+                    <option value="processing" ${o.status==='processing'?'selected':''}>⏳ Processing</option>
+                    <option value="shipped" ${o.status==='shipped'?'selected':''}>📤 Shipped</option>
+                    <option value="delivered" ${o.status==='delivered'?'selected':''}>✅ Delivered</option>
+                    <option value="cancelled" ${o.status==='cancelled'?'selected':''}>❌ Cancelled</option>
+                </select>
+            </td>
+            <td>
+                <button class="action-btn view" onclick="viewOrder('${o.id}')">👁️</button>
+                <button class="action-btn del" onclick="deleteOrder('${o.id}')">🗑️</button>
+            </td>
+        </tr>
+    `).join('');
+}
 
-    function saveCustomers() {
-        localStorage.setItem('jmd_customers', JSON.stringify(customers));
-    }
+function filterOrders(status, el) {
+    filterStatus = status;
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    if(el) el.classList.add('active');
+    renderOrders();
+}
 
-    // ==========================================
-    // GITHUB SAVE
-    // ==========================================
-    async function saveToGitHub(path, data) {
-        try {
-            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
-            
-            const getRes = await fetch(url, {
-                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
-            });
-            let sha = null;
-            if (getRes.ok) {
-                const fileData = await getRes.json();
-                sha = fileData.sha;
-            }
-
-            await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Update ${path}`,
-                    content: btoa(JSON.stringify(data, null, 2)),
-                    sha: sha,
-                    branch: GITHUB_CONFIG.branch
-                })
-            });
-        } catch (error) {
-            console.error('GitHub save error:', error);
-        }
-    }
-
-    // ==========================================
-    // 🔥 WHATSAPP FUNCTIONS
-    // ==========================================
-    
-    // Send WhatsApp Message
-    function sendWhatsApp(order) {
-        if (!isWhatsAppActive) {
-            console.log('WhatsApp notifications are paused');
-            return false;
-        }
-
-        const phone = WHATSAPP_CONFIG.adminNumber || '+919999999999';
-        const template = WHATSAPP_CONFIG.template || WHATSAPP_CONFIG.template;
-        
-        // Format items
-        const itemsList = order.items.map(i => `• ${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}`).join('\n');
-        
-        // Replace placeholders
-        let message = template
-            .replace(/{orderId}/g, order.id)
-            .replace(/{customer}/g, order.customerName || 'Guest')
-            .replace(/{phone}/g, order.customerPhone || 'N/A')
-            .replace(/{total}/g, order.total.toLocaleString())
-            .replace(/{items}/g, itemsList)
-            .replace(/{status}/g, order.status || 'Processing');
-
-        // Create WhatsApp URL
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-
-        // Open WhatsApp
-        window.open(whatsappUrl, '_blank');
-
-        // Log
-        const log = {
-            orderId: order.id,
-            phone: phone,
-            timestamp: new Date().toLocaleString(),
-            status: 'sent'
-        };
-        whatsappLogs.unshift(log);
-        saveWhatsAppLogs();
-        updateWhatsAppLogs();
-
-        // Update stats
-        const count = parseInt(document.getElementById('totalWhatsApp').textContent) || 0;
-        document.getElementById('totalWhatsApp').textContent = count + 1;
-
-        showToast('💬 WhatsApp message sent!');
-        return true;
-    }
-
-    // Test WhatsApp
-    function testWhatsApp() {
-        const testOrder = {
-            id: 'TEST' + Date.now().toString().slice(-6),
-            customerName: 'Test Customer',
-            customerPhone: '+919999999999',
-            total: 3999,
-            status: 'processing',
-            items: [
-                { brand: 'Nike', name: 'Air Max', qty: 1, price: 3999 }
-            ]
-        };
-        sendWhatsApp(testOrder);
-    }
-
-    // Save WhatsApp Settings
-    function saveWhatsAppSettings() {
-        const number = document.getElementById('adminWhatsApp').value;
-        const template = document.getElementById('whatsappTemplate').value;
-        
-        WHATSAPP_CONFIG.adminNumber = number;
-        WHATSAPP_CONFIG.template = template;
-        
-        localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
-        showToast('✅ WhatsApp settings saved!');
-    }
-
-    // Load WhatsApp Settings
-    function loadWhatsAppSettings() {
-        try {
-            const saved = localStorage.getItem('whatsapp_config');
-            if (saved) {
-                const config = JSON.parse(saved);
-                WHATSAPP_CONFIG.adminNumber = config.adminNumber || WHATSAPP_CONFIG.adminNumber;
-                WHATSAPP_CONFIG.template = config.template || WHATSAPP_CONFIG.template;
-            }
-            if (WHATSAPP_CONFIG.adminNumber) {
-                document.getElementById('adminWhatsApp').value = WHATSAPP_CONFIG.adminNumber;
-            }
-            if (WHATSAPP_CONFIG.template) {
-                document.getElementById('whatsappTemplate').value = WHATSAPP_CONFIG.template;
-            }
-        } catch (e) {}
-        
-        loadWhatsAppLogs();
-        updateWhatsAppLogs();
-    }
-
-    // Save WhatsApp Logs
-    function saveWhatsAppLogs() {
-        localStorage.setItem('whatsapp_logs', JSON.stringify(whatsappLogs));
-    }
-
-    // Load WhatsApp Logs
-    function loadWhatsAppLogs() {
-        try {
-            const saved = localStorage.getItem('whatsapp_logs');
-            if (saved) {
-                whatsappLogs = JSON.parse(saved);
-            }
-        } catch (e) {
-            whatsappLogs = [];
-        }
-    }
-
-    // Update WhatsApp Logs Display
-    function updateWhatsAppLogs() {
-        const container = document.getElementById('whatsappLogs');
-        if (!container) return;
-        
-        if (whatsappLogs.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:12px;">No WhatsApp messages sent yet</div>';
-            return;
-        }
-        
-        container.innerHTML = whatsappLogs.slice(0, 10).map(log => `
-            <div style="padding:6px 0;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;">
-                <span>📱 ${log.orderId}</span>
-                <span style="color:var(--text-secondary);">${log.timestamp}</span>
-                <span style="color:#25D366;">✅ ${log.status}</span>
-            </div>
-        `).join('');
-    }
-
-    // Toggle WhatsApp
-    function toggleWhatsApp() {
-        isWhatsAppActive = !isWhatsAppActive;
-        const btn = document.getElementById('whatsappToggleBtn');
-        const dot = document.getElementById('whatsappDot');
-        const statusText = document.getElementById('whatsappStatusText');
-        const badge = document.getElementById('whatsappBadge');
-        
-        if (isWhatsAppActive) {
-            btn.textContent = '⏸️ Pause';
-            dot.className = 'dot active';
-            statusText.textContent = 'Active - New orders will be sent to WhatsApp';
-            badge.textContent = 'ON';
-            badge.style.background = '#25D366';
-            showToast('✅ WhatsApp notifications activated');
-        } else {
-            btn.textContent = '▶️ Resume';
-            dot.className = 'dot inactive';
-            statusText.textContent = 'Paused - Orders will be saved but no WhatsApp messages';
-            badge.textContent = 'OFF';
-            badge.style.background = '#ff4444';
-            showToast('⏸️ WhatsApp notifications paused');
-        }
-        
-        localStorage.setItem('whatsapp_active', JSON.stringify(isWhatsAppActive));
-    }
-
-    // Load WhatsApp Status
-    function loadWhatsAppStatus() {
-        try {
-            const saved = localStorage.getItem('whatsapp_active');
-            if (saved) {
-                isWhatsAppActive = JSON.parse(saved);
-                if (!isWhatsAppActive) {
-                    document.getElementById('whatsappToggleBtn').textContent = '▶️ Resume';
-                    document.getElementById('whatsappDot').className = 'dot inactive';
-                    document.getElementById('whatsappStatusText').textContent = 'Paused - Orders will be saved but no WhatsApp messages';
-                    document.getElementById('whatsappBadge').textContent = 'OFF';
-                    document.getElementById('whatsappBadge').style.background = '#ff4444';
-                }
-            }
-        } catch (e) {}
-    }
-
-    // ==========================================
-    // ORDER FUNCTIONS (with WhatsApp)
-    // ==========================================
-    function addOrder(orderData) {
-        const newOrder = {
-            id: 'ORD' + Date.now().toString().slice(-8),
-            ...orderData,
-            date: new Date().toLocaleString(),
-            status: 'processing'
-        };
-        
-        orders.unshift(newOrder);
-        saveOrders();
-        updateDashboard();
+// ==========================================
+// UPDATE STATUS
+// ==========================================
+async function updateStatus(orderId, status) {
+    const order = orders.find(o => o.id === orderId);
+    if(order) {
+        order.status = status;
+        await saveOrdersToGitHub();
         renderOrders();
-        updateBadges();
-        
-        // 🔥 Send WhatsApp Notification
-        if (isWhatsAppActive) {
-            setTimeout(() => sendWhatsApp(newOrder), 500);
-        }
-        
-        showToast('📦 New order placed!');
-        return newOrder;
+        updateStats();
+        toast('✅ Status updated to ' + status);
     }
+}
 
-    // ==========================================
-    // UPDATE DASHBOARD
-    // ==========================================
-    function updateDashboard() {
-        const total = orders.length;
-        const revenue = orders.reduce((sum, o) => sum + o.total, 0);
-        const uniqueCustomers = new Set(orders.map(o => o.customerEmail)).size;
-        const avgRating = products.reduce((sum, p) => sum + (p.rating || 0), 0) / (products.length || 1);
-        const whatsappCount = whatsappLogs.length;
-        
-        document.getElementById('totalOrders').textContent = total;
-        document.getElementById('totalRevenue').textContent = '₹' + revenue.toLocaleString();
-        document.getElementById('totalCustomers').textContent = uniqueCustomers;
-        document.getElementById('avgRating').textContent = avgRating.toFixed(1);
-        document.getElementById('totalWhatsApp').textContent = whatsappCount;
-        
-        const recent = orders.slice(0, 5);
-        const tbody = document.getElementById('recentOrders');
-        tbody.innerHTML = recent.map(o => `
-            <tr>
-                <td><strong>${o.id}</strong></td>
-                <td>${o.customerName || 'Guest'}</td>
-                <td>₹${o.total.toLocaleString()}</td>
-                <td><span class="status-badge ${o.status}">${o.status.toUpperCase()}</span></td>
-                <td>${o.whatsappSent ? '✅ Sent' : '⏳ Pending'}</td>
-                <td>${o.date}</td>
-            </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No orders yet</td></tr>';
-    }
+// ==========================================
+// VIEW ORDER
+// ==========================================
+function viewOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if(!order) return;
+    let html = `<button class="modal-close" onclick="closeModal()">✕</button>
+        <h2>📦 Order ${order.id}</h2>
+        <div style="margin-top:12px;">
+            <p><strong>Customer:</strong> ${order.customer}</p>
+            <p><strong>Email:</strong> ${order.email}</p>
+            <p><strong>Phone:</strong> ${order.phone}</p>
+            <p><strong>Date:</strong> ${order.date}</p>
+            <p><strong>Status:</strong> <span class="status-badge ${order.status}">${order.status.toUpperCase()}</span></p>
+            <p><strong>Items:</strong></p>
+            <ul style="padding-left:20px;margin:8px 0;">
+                ${order.items.map(i => `<li>${i.brand} ${i.name} × ${i.qty} = ₹${(i.price*i.qty).toLocaleString()}</li>`).join('')}
+            </ul>
+            <p><strong style="font-size:18px;">Total: ₹${order.total.toLocaleString()}</strong></p>
+        </div>
+        <button class="btn-secondary" onclick="closeModal()">Close</button>`;
+    openModal(html);
+}
 
-    // ==========================================
-    // RENDER ORDERS
-    // ==========================================
-    function renderOrders() {
-        const filtered = currentOrders.filter(o => {
-            if (currentFilter === 'all') return true;
-            return o.status === currentFilter;
-        }).filter(o => {
-            if (!currentSearch) return true;
-            const search = currentSearch.toLowerCase();
-            return o.id.toLowerCase().includes(search) || 
-                   (o.customerName || '').toLowerCase().includes(search);
-        });
-        
-        const tbody = document.getElementById('ordersTable');
-        tbody.innerHTML = filtered.map(o => `
-            <tr>
-                <td><strong>${o.id}</strong></td>
-                <td>${o.customerName || 'Guest'}</td>
-                <td>${o.customerPhone || 'N/A'}</td>
-                <td>${o.items.map(i => `${i.brand} ${i.name}`).join(', ')}</td>
-                <td>₹${o.total.toLocaleString()}</td>
-                <td>
-                    <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
-                        <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>Processing</option>
-                        <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>Shipped</option>
-                        <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                        <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                    </select>
-                </td>
-                <td>${o.whatsappSent ? '✅ Sent' : '⏳ Pending'}</td>
-                <td>${o.date}</td>
-                <td>
-                    <button class="action-btn view" onclick="viewOrder('${o.id}')">👁️</button>
-                    <button class="action-btn whatsapp" onclick="sendWhatsAppFromOrder('${o.id}')">💬</button>
-                    <button class="action-btn delete" onclick="deleteOrder('${o.id}')">🗑️</button>
-                </td>
-            </tr>
-        `).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No orders found</td></tr>';
-        
-        updateBadges();
-    }
+// ==========================================
+// DELETE ORDER
+// ==========================================
+async function deleteOrder(orderId) {
+    if(!confirm('Delete order ' + orderId + '?')) return;
+    orders = orders.filter(o => o.id !== orderId);
+    await saveOrdersToGitHub();
+    renderOrders();
+    updateStats();
+    toast('🗑️ Order deleted');
+}
 
-    function sendWhatsAppFromOrder(orderId) {
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
-            sendWhatsApp(order);
-            order.whatsappSent = true;
-            saveOrders();
-            renderOrders();
-        }
-    }
+// ==========================================
+// UPDATE STATS
+// ==========================================
+function updateStats() {
+    const total = orders.length;
+    const revenue = orders.reduce((s,o) => s + o.total, 0);
+    const customers = new Set(orders.map(o => o.email)).size;
+    const pending = orders.filter(o => o.status === 'processing').length;
+    document.getElementById('statOrders').textContent = total;
+    document.getElementById('statRevenue').textContent = '₹' + revenue.toLocaleString();
+    document.getElementById('statCustomers').textContent = customers;
+    document.getElementById('statPending').textContent = pending;
+}
 
-    // ==========================================
-    // UPDATE ORDER STATUS
-    // ==========================================
-    function updateOrderStatus(orderId, status) {
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
-            order.status = status;
-            saveOrders();
-            renderOrders();
-            updateDashboard();
-            showToast('✅ Order status updated to ' + status);
-            
-            // Send WhatsApp on status change
-            if (isWhatsAppActive && status === 'shipped' || status === 'delivered') {
-                sendWhatsApp(order);
-            }
-        }
-    }
+// ==========================================
+// TOAST
+// ==========================================
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => t.style.display = 'none', 2500);
+}
 
-    // ==========================================
-    // VIEW ORDER
-    // ==========================================
-    function viewOrder(orderId) {
-        const order = orders.find(o => o.id === orderId);
-        if (!order) return;
-        
-        let html = `
-            <button class="modal-close" onclick="closeModal()">✕</button>
-            <h2 style="margin-bottom:16px;">📦 Order Details</h2>
-            <div style="display:grid;gap:8px;">
-                <p><strong>Order ID:</strong> ${order.id}</p>
-                <p><strong>Customer:</strong> ${order.customerName || 'Guest'}</p>
-                <p><strong>Email:</strong> ${order.customerEmail || 'N/A'}</p>
-                <p><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</p>
-                <p><strong>Date:</strong> ${order.date}</p>
-                <p><strong>Status:</strong> <span class="status-badge ${order.status}">${order.status.toUpperCase()}</span></p>
-                <p><strong>WhatsApp:</strong> ${order.whatsappSent ? '✅ Sent' : '⏳ Pending'}</p>
-                <p><strong>Items:</strong></p>
-                <ul style="padding-left:20px;">
-                    ${order.items.map(i => `<li>${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}</li>`).join('')}
-                </ul>
-                <p><strong style="font-size:18px;">Total: ₹${order.total.toLocaleString()}</strong></p>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
-                <button class="btn-whatsapp" onclick="sendWhatsAppFromOrder('${order.id}'); closeModal();">💬 Send WhatsApp</button>
-                <button class="btn-submit" onclick="closeModal()">Close</button>
-            </div>
-        `;
-        openModal(html);
-    }
+function openModal(html) { document.getElementById('modalContent').innerHTML = html; document.getElementById('modalOverlay').classList.add('show'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
 
-    // ==========================================
-    // DELETE ORDER
-    // ==========================================
-    function deleteOrder(orderId) {
-        if (!confirm('Delete order ' + orderId + '?')) return;
-        orders = orders.filter(o => o.id !== orderId);
-        saveOrders();
-        renderOrders();
-        updateDashboard();
-        updateBadges();
-        showToast('🗑️ Order deleted');
-    }
+// ==========================================
+// KEYBOARD SHORTCUT
+// ==========================================
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeModal();
+});
 
-    // ==========================================
-    // FILTER ORDERS
-    // ==========================================
-    function filterOrders(status) {
-        currentFilter = status;
-        document.querySelectorAll('#orderTabs .tab-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        renderOrders();
-    }
-
-    function searchOrders(query) {
-        currentSearch = query;
-        renderOrders();
-    }
-
-    // ==========================================
-    // UPDATE BADGES
-    // ==========================================
-    function updateBadges() {
-        const processing = orders.filter(o => o.status === 'processing').length;
-        const shipped = orders.filter(o => o.status === 'shipped').length;
-        const delivered = orders.filter(o => o.status === 'delivered').length;
-        const cancelled = orders.filter(o => o.status === 'cancelled').length;
-        const total = orders.length;
-        
-        document.getElementById('orderBadge').textContent = processing || '';
-        document.getElementById('countAll').textContent = total;
-        document.getElementById('countProcessing').textContent = processing;
-        document.getElementById('countShipped').textContent = shipped;
-        document.getElementById('countDelivered').textContent = delivered;
-        document.getElementById('countCancelled').textContent = cancelled;
-    }
-
-    // ==========================================
-    // PRODUCT FUNCTIONS
-    // ==========================================
-    function renderProducts() {
-        const tbody = document.getElementById('productsTable');
-        const search = document.getElementById('productSearch')?.value?.toLowerCase() || '';
-        
-        const filtered = products.filter(p => {
-            if (!search) return true;
-            return p.name.toLowerCase().includes(search) || 
-                   p.brand.toLowerCase().includes(search);
-        });
-        
-        tbody.innerHTML = filtered.map(p => `
-            <tr>
-                <td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
-                <td><strong>${p.brand}</strong></td>
-                <td>${p.name}</td>
-                <td><span style="background:var(--input-bg);padding:2px 10px;border-radius:20px;font-size:11px;">${p.category}</span></td>
-                <td>₹${p.price.toLocaleString()}</td>
-                <td>⭐ ${p.rating}</td>
-                <td>
-                    <button class="action-btn view" onclick="editProduct(${p.id})">✏️</button>
-                    <button class="action-btn delete" onclick="deleteProduct(${p.id})">🗑️</button>
-                </td>
-            </tr>
-        `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No products added</td></tr>';
-    }
-
-    function searchProducts(query) {
-        renderProducts();
-    }
-
-    function addProduct() {
-        const brand = document.getElementById('prodBrand').value.trim();
-        const name = document.getElementById('prodName').value.trim();
-        const category = document.getElementById('prodCategory').value;
-        const image = document.getElementById('prodImage').value.trim();
-        const price = parseInt(document.getElementById('prodPrice').value);
-        const oldPrice = parseInt(document.getElementById('prodOldPrice').value);
-        const rating = parseFloat(document.getElementById('prodRating').value);
-        const reviews = parseInt(document.getElementById('prodReviews').value);
-        const badge = document.getElementById('prodBadge').value;
-        
-        if (!brand || !name || !image || !price) {
-            showToast('⚠️ Please fill all required fields');
-            return;
-        }
-        
-        const newProduct = {
-            id: Date.now(),
-            brand, name, category, image, price,
-            oldPrice: oldPrice || price * 1.5,
-            rating: rating || 4.0,
-            reviews: reviews || 0,
-            badge
-        };
-        
-        products.push(newProduct);
-        saveProducts();
-        renderProducts();
-        clearProductForm();
-        showToast('✅ Product added successfully!');
-    }
-
-    function clearProductForm() {
-        ['prodBrand', 'prodName', 'prodImage', 'prodPrice', 'prodOldPrice', 'prodRating', 'prodReviews'].forEach(id => {
-            document.getElementById(id).value = '';
-        });
-        const btn = document.querySelector('#productForm .btn-submit');
-        btn.textContent = '➕ Add Product';
-        btn.onclick = addProduct;
-    }
-
-    function deleteProduct(id) {
-        if (!confirm('Delete this product?')) return;
-        products = products.filter(p => p.id !== id);
-        saveProducts();
-        renderProducts();
-        showToast('🗑️ Product deleted');
-    }
-
-    function editProduct(id) {
-        const p = products.find(pr => pr.id === id);
-        if (!p) return;
-        
-        document.getElementById('prodBrand').value = p.brand;
-        document.getElementById('prodName').value = p.name;
-        document.getElementById('prodCategory').value = p.category;
-        document.getElementById('prodImage').value = p.image;
-        document.getElementById('prodPrice').value = p.price;
-        document.getElementById('prodOldPrice').value = p.oldPrice;
-        document.getElementById('prodRating').value = p.rating;
-        document.getElementById('prodReviews').value = p.reviews;
-        document.getElementById('prodBadge').value = p.badge;
-        
-        const btn = document.querySelector('#productForm .btn-submit');
-        btn.textContent = '✏️ Update Product';
-        btn.onclick = function() { updateProduct(id); };
-        showToast('✏️ Edit product, then click update');
-    }
-
-    function updateProduct(id) {
-        const index = products.findIndex(p => p.id === id);
-        if (index === -1) return;
-        
-        products[index] = {
-            id: id,
-            brand: document.getElementById('prodBrand').value.trim(),
-            name: document.getElementById('prodName').value.trim(),
-            category: document.getElementById('prodCategory').value,
-            image: document.getElementById('prodImage').value.trim(),
-            price: parseInt(document.getElementById('prodPrice').value),
-            oldPrice: parseInt(document.getElementById('prodOldPrice').value),
-            rating: parseFloat(document.getElementById('prodRating').value),
-            reviews: parseInt(document.getElementById('prodReviews').value),
-            badge: document.getElementById('prodBadge').value
-        };
-        
-        saveProducts();
-        renderProducts();
-        clearProductForm();
-        showToast('✅ Product updated!');
-    }
-
-    // ==========================================
-    // CUSTOMERS
-    // ==========================================
-    function renderCustomers() {
-        const tbody = document.getElementById('customersTable');
-        const customerMap = new Map();
-        
-        orders.forEach(o => {
-            const email = o.customerEmail || 'guest@email.com';
-            if (!customerMap.has(email)) {
-                customerMap.set(email, {
-                    name: o.customerName || 'Guest',
-                    email: email,
-                    phone: o.customerPhone || 'N/A',
-                    orders: 0,
-                    total: 0,
-                    joined: o.date || 'N/A'
-                });
-            }
-            const c = customerMap.get(email);
-            c.orders += 1;
-            c.total += o.total;
-        });
-        
-        const customersList = Array.from(customerMap.values());
-        
-        tbody.innerHTML = customersList.map(c => `
-            <tr>
-                <td><strong>${c.name}</strong></td>
-                <td>${c.email}</td>
-                <td>${c.phone}</td>
-                <td>${c.orders}</td>
-                <td>₹${c.total.toLocaleString()}</td>
-                <td>${c.joined}</td>
-            </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No customers yet</td></tr>';
-    }
-
-    // ==========================================
-    // SETTINGS
-    // ==========================================
-    function saveSettings() {
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-        const storeName = document.getElementById('storeName').value;
-        
-        if (email) ADMIN_CREDENTIALS.email = email;
-        if (password) ADMIN_CREDENTIALS.password = password;
-        
-        localStorage.setItem('jmd_store_name', storeName);
-        showToast('✅ Settings saved!');
-    }
-
-    // ==========================================
-    // SWITCH TABS
-    // ==========================================
-    function switchTab(tab) {
-        ['Dashboard', 'Orders', 'Products', 'Whatsapp', 'Customers', 'Settings'].forEach(t => {
-            const el = document.getElementById('tab' + t);
-            if (el) el.style.display = 'none';
-        });
-        
-        const tabName = tab.charAt(0).toUpperCase() + tab.slice(1);
-        const el = document.getElementById('tab' + tabName);
-        if (el) el.style.display = 'block';
-        
-        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            if (item.textContent.trim().toLowerCase().includes(tab)) {
-                item.classList.add('active');
-            }
-        });
-        
-        document.getElementById('pageTitle').textContent = tabName;
-        
-        if (tab === 'orders') renderOrders();
-        if (tab === 'products') renderProducts();
-        if (tab === 'customers') renderCustomers();
-        if (tab === 'dashboard') updateDashboard();
-        if (tab === 'whatsapp') {
-            loadWhatsAppSettings();
-            updateWhatsAppLogs();
-        }
-        
-        closeSidebar();
-    }
-
-    // ==========================================
-    // TOAST
-    // ==========================================
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.style.display = 'block';
-        clearTimeout(t._timeout);
-        t._timeout = setTimeout(() => t.style.display = 'none', 3000);
-    }
-
-    // ==========================================
-    // MODAL
-    // ==========================================
-    function openModal(html) {
-        document.getElementById('modalContent').innerHTML = html;
-        document.getElementById('modalOverlay').classList.add('show');
-    }
-
-    function closeModal() {
-        document.getElementById('modalOverlay').classList.remove('show');
-    }
-
-    // ==========================================
-    // SIDEBAR TOGGLE
-    // ==========================================
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('show');
-    }
-
-    function closeSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-    }
-
-    // ==========================================
-    // DARK MODE
-    // ==========================================
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        const btn = document.querySelector('.admin-toggle');
-        btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        localStorage.setItem('admin_darkmode', document.body.classList.contains('dark-mode'));
-    }
-
-    // ==========================================
-    // EXPOSE FUNCTIONS TO GLOBAL SCOPE
-    // ==========================================
-    window.sendWhatsApp = sendWhatsApp;
-    window.testWhatsApp = testWhatsApp;
-    window.sendWhatsAppFromOrder = sendWhatsAppFromOrder;
-    window.addOrder = addOrder;
-
-    // ==========================================
-    // INIT
-    // ==========================================
-    if (localStorage.getItem('admin_darkmode') === 'true') {
-        document.body.classList.add('dark-mode');
-        document.querySelector('.admin-toggle').textContent = '☀️';
-    }
-
-    loadWhatsAppStatus();
-    initAdmin();
-
-    console.log('🔥 Admin Panel + WhatsApp Ready!');
-    console.log('💬 WhatsApp Status:', isWhatsAppActive ? 'Active' : 'Paused');
-    console.log('📱 Admin Number:', WHATSAPP_CONFIG.adminNumber);
-    </script>
+// Check if already logged in
+if(localStorage.getItem('admin_logged') === 'true') {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadOrders();
+}
+</script>
 </body>
 </html>
