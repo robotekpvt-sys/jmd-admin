@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
-        :root{--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#666;--text3:#999;--border:#e8e8e8;--input:#f5f5f7;--primary:#ff3f6c;--secondary:#1a1a2e}
-        body.dark-mode{--bg:#0a0a1a;--card:#12122a;--text:#f0f0f0;--text2:#aaa;--text3:#666;--border:#2a2a4e;--input:#1a1a3e}
+        :root{--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#666;--border:#e8e8e8;--input:#f5f5f7;--primary:#ff3f6c;--secondary:#1a1a2e}
+        body.dark-mode{--bg:#0a0a1a;--card:#12122a;--text:#f0f0f0;--text2:#aaa;--border:#2a2a4e;--input:#1a1a3e}
         body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;min-height:100vh}
 
         .login-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:20px}
@@ -25,7 +25,6 @@
         .login-box .btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,63,108,0.3)}
         .login-box .footer-text{text-align:center;color:rgba(255,255,255,0.3);font-size:12px;margin-top:16px}
 
-        /* ADMIN PANEL */
         .admin-wrapper{display:flex;min-height:100vh}
         .sidebar{width:260px;background:var(--secondary);min-height:100vh;position:fixed;top:0;left:0;bottom:0;z-index:1000;overflow-y:auto;transition:transform 0.3s}
         .sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.06)}
@@ -148,12 +147,12 @@
     <div class="login-box">
         <div class="logo"><span class="j">JMD</span><span class="b">BOOT</span></div>
         <div class="sub">✦ ADMIN PANEL ✦</div>
-        <label>📧 Email Address</label>
-        <input type="email" id="loginEmail" value="admin@jmdboot.com">
+        <label>👤 Username</label>
+        <input type="text" id="loginEmail" value="jk" placeholder="Enter username">
         <label>🔒 Password</label>
-        <input type="password" id="loginPassword" value="admin123">
+        <input type="password" id="loginPassword" value="1234" placeholder="Enter password">
         <button class="btn-login" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-        <div class="footer-text">Default: admin@jmdboot.com / admin123</div>
+        <div class="footer-text">Default: jk / 1234</div>
     </div>
 </div>
 
@@ -261,8 +260,8 @@
                 </div>
                 <div class="table-scroll">
                     <table>
-                        <thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Items</th><th>Amount</th><th>Status</th><th>WhatsApp</th><th>Date</th><th>Action</th></tr></thead>
-                        <tbody id="ordersTable"><tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text3);">No orders found</td></tr></tbody>
+                        <thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Amount</th><th>Status</th><th>WhatsApp</th><th>Date</th><th>Action</th></tr></thead>
+                        <tbody id="ordersTable"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text3);">No orders found</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -284,14 +283,16 @@
 Order ID: {orderId}
 Customer: {customer}
 Phone: {phone}
+Address: {address}
 Total: ₹{total}
 
 Items:
 {items}
 
 Status: {status}
+Payment: COD
 
-📦 Thank you for shopping at JMD BOOT HOUSE!</textarea>
+📦 JMD BOOT HOUSE</textarea>
                 </div>
                 <div class="field">
                     <label>📋 Preview</label>
@@ -314,8 +315,8 @@ Status: {status}
                 <div class="table-header"><h3>👤 Customers</h3></div>
                 <div class="table-scroll">
                     <table>
-                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Spent</th><th>Joined</th></tr></thead>
-                        <tbody id="customersTable"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">No customers yet</td></tr></tbody>
+                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Spent</th><th>Joined</th></tr></thead>
+                        <tbody id="customersTable"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No customers yet</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -325,7 +326,7 @@ Status: {status}
         <div id="tabSettings" style="display:none;">
             <div class="whatsapp-settings">
                 <h3 style="margin-bottom:16px;">⚙️ Settings</h3>
-                <div class="field"><label>Admin Email</label><input type="email" id="adminEmail" value="admin@jmdboot.com"></div>
+                <div class="field"><label>Admin Username</label><input type="text" id="adminEmail" value="jk"></div>
                 <div class="field"><label>New Password</label><input type="password" id="adminPassword" placeholder="Enter new password"></div>
                 <button class="btn-whatsapp" onclick="saveAdminSettings()" style="background:linear-gradient(135deg,#ff3f6c,#ff6b8a);"><i class="fas fa-save"></i> Save</button>
             </div>
@@ -347,7 +348,7 @@ Status: {status}
 
 <script>
 // ==========================================
-// 🔥 FIREBASE
+// 🔥 FIREBASE CONFIG
 // ==========================================
 const firebaseConfig = {
     apiKey: "AIzaSyDcCMm1NUPPt8iSdruCrsfRvUujWETsBq8",
@@ -361,6 +362,14 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+
+// ==========================================
+// ADMIN CREDENTIALS
+// ==========================================
+const ADMIN = {
+    email: 'jk',
+    password: '1234'
+};
 
 // ==========================================
 // STATE
@@ -382,38 +391,31 @@ let WHATSAPP_CONFIG = {
 Order ID: {orderId}
 Customer: {customer}
 Phone: {phone}
+Address: {address}
 Total: ₹{total}
 
 Items:
 {items}
 
 Status: {status}
+Payment: COD
 
-📦 Thank you for shopping at JMD BOOT HOUSE!`
+📦 JMD BOOT HOUSE`
 };
 
 // ==========================================
-// ADMIN CREDENTIALS
-// ==========================================
-const ADMIN = { email: 'admin@jmdboot.com', password: 'admin123' };
-
-// ==========================================
-// 🔥 LOGIN
+// LOGIN / LOGOUT
 // ==========================================
 function adminLogin() {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPassword').value;
-    
     if(email === ADMIN.email && pass === ADMIN.password) {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         localStorage.setItem('admin_logged', 'true');
-        
-        // Load everything
         loadOrders();
-        loadWhatsAppSettings();
         startFirebaseListener();
-        
+        loadWhatsAppSettings();
         toast('✅ Welcome Admin!');
     } else {
         toast('❌ Invalid credentials!');
@@ -424,14 +426,17 @@ function adminLogout() {
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('adminPanel').style.display = 'none';
     localStorage.removeItem('admin_logged');
+    if(window._firebaseListener) { database.ref('orders').off(); }
     toast('👋 Logged out');
 }
 
 // ==========================================
-// 🔥 LOAD ORDERS
+// 🔥 LOAD ORDERS FROM FIREBASE
 // ==========================================
 function loadOrders() {
-    // 1. Try localStorage first (quick)
+    document.getElementById('lastUpdate')?.textContent = '📡 Loading...';
+
+    // Try localStorage first
     try {
         const local = localStorage.getItem('jmd_orders');
         if(local) {
@@ -444,13 +449,12 @@ function loadOrders() {
         }
     } catch(e) {}
 
-    // 2. Try Firebase (live)
+    // Firebase live
     database.ref('orders').once('value').then(snapshot => {
         const fbOrders = [];
         snapshot.forEach(child => {
             fbOrders.push(child.val());
         });
-        
         if(fbOrders.length > 0) {
             orders = fbOrders;
             localStorage.setItem('jmd_orders', JSON.stringify(orders));
@@ -458,11 +462,11 @@ function loadOrders() {
         } else {
             console.log('⚠️ No orders in Firebase');
         }
-        
         renderOrders();
         updateStats();
         updateBadges();
         updateCustomers();
+        document.getElementById('lastUpdate')?.textContent = '✅ ' + new Date().toLocaleTimeString();
         toast('✅ Orders updated!');
     }).catch(err => {
         console.error('❌ Firebase error:', err);
@@ -471,7 +475,7 @@ function loadOrders() {
 }
 
 // ==========================================
-// 🔥 FIREBASE LISTENER (Live updates)
+// 🔥 FIREBASE LISTENER - LIVE UPDATES
 // ==========================================
 function startFirebaseListener() {
     if(window._firebaseListener) return;
@@ -481,7 +485,6 @@ function startFirebaseListener() {
         snapshot.forEach(child => {
             fbOrders.push(child.val());
         });
-        
         if(fbOrders.length > 0) {
             orders = fbOrders;
             localStorage.setItem('jmd_orders', JSON.stringify(orders));
@@ -489,6 +492,7 @@ function startFirebaseListener() {
             updateStats();
             updateBadges();
             updateCustomers();
+            document.getElementById('lastUpdate')?.textContent = '🔥 ' + new Date().toLocaleTimeString();
             console.log('🔥 Live update from Firebase:', orders.length);
         }
     });
@@ -509,7 +513,8 @@ function renderOrders() {
         const s = currentSearch.toLowerCase();
         filtered = filtered.filter(o => 
             (o.id || '').toLowerCase().includes(s) ||
-            (o.customerName || '').toLowerCase().includes(s)
+            (o.customerName || '').toLowerCase().includes(s) ||
+            (o.customerPhone || '').toLowerCase().includes(s)
         );
     }
 
@@ -517,14 +522,15 @@ function renderOrders() {
     const tbody = document.getElementById('ordersTable');
     if(tbody) {
         if(!filtered || filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text3);">📦 No orders found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text3);">📦 No orders found</td></tr>';
         } else {
             tbody.innerHTML = filtered.map(o => `
                 <tr>
                     <td><strong>${o.id || 'N/A'}</strong></td>
-                    <td>${o.customerName || 'Guest'}</td>
+                    <td><strong>${o.customerName || 'Guest'}</strong></td>
                     <td>${o.customerPhone || 'N/A'}</td>
-                    <td style="font-size:10px;">${(o.items || []).map(i => `${i.brand||''} ${i.name||''}×${i.qty||1}`).join(', ')}</td>
+                    <td style="font-size:10px;max-width:120px;word-wrap:break-word;">${o.customerAddress || 'N/A'}</td>
+                    <td style="font-size:10px;">${(o.items || []).map(i => `${i.brand||''} ${i.name||''}(${i.size||'M'})×${i.qty||1}`).join(', ')}</td>
                     <td><strong>₹${(o.total || 0).toLocaleString()}</strong></td>
                     <td>
                         <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
@@ -579,17 +585,11 @@ function updateStatus(orderId, status) {
     
     order.status = status;
     localStorage.setItem('jmd_orders', JSON.stringify(orders));
-    
-    // Update Firebase
     database.ref('orders/' + orderId).update({ status: status }).catch(()=>{});
     
     renderOrders();
     updateStats();
     toast('✅ Status updated to ' + status);
-    
-    if(status === 'shipped' || status === 'delivered') {
-        sendWhatsApp(order);
-    }
 }
 
 // ==========================================
@@ -604,13 +604,15 @@ function viewOrder(orderId) {
         <h2 style="margin-bottom:14px;">📦 Order ${order.id}</h2>
         <div style="display:grid;gap:6px;font-size:13px;">
             <p><strong>Customer:</strong> ${order.customerName || 'Guest'}</p>
-            <p><strong>Email:</strong> ${order.customerEmail || 'N/A'}</p>
             <p><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</p>
+            <p><strong>Address:</strong> ${order.customerAddress || 'N/A'}</p>
+            <p><strong>Email:</strong> ${order.customerEmail || 'N/A'}</p>
             <p><strong>Date:</strong> ${order.date || 'N/A'}</p>
             <p><strong>Status:</strong> <span class="status-badge ${order.status}">${(order.status || 'processing').toUpperCase()}</span></p>
+            <p><strong>Payment:</strong> ${order.paymentMethod || 'COD'}</p>
             <p><strong>Items:</strong></p>
             <ul style="padding-left:20px;margin:6px 0;">
-                ${(order.items || []).map(i => `<li>${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}</li>`).join('')}
+                ${(order.items || []).map(i => `<li>${i.brand} ${i.name} (${i.size||'M'}) × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}</li>`).join('')}
             </ul>
             <p><strong style="font-size:17px;">Total: ₹${(order.total || 0).toLocaleString()}</strong></p>
         </div>
@@ -658,10 +660,12 @@ function updateStats() {
     const total = orders.length;
     const revenue = orders.reduce((s, o) => s + (o.total || 0), 0);
     const customers = new Set(orders.map(o => o.customerEmail)).size;
+    const pending = orders.filter(o => o.status === 'processing').length;
     
     document.getElementById('statOrders').textContent = total;
     document.getElementById('statRevenue').textContent = '₹' + revenue.toLocaleString();
     document.getElementById('statCustomers').textContent = customers;
+    document.getElementById('statPending').textContent = pending;
 }
 
 function updateBadges() {
@@ -687,6 +691,7 @@ function updateCustomers() {
                 name: o.customerName || 'Guest',
                 email: email,
                 phone: o.customerPhone || 'N/A',
+                address: o.customerAddress || 'N/A',
                 orders: 0,
                 total: 0,
                 joined: o.date || 'N/A'
@@ -698,13 +703,14 @@ function updateCustomers() {
     });
     
     if(map.size === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">No customers yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No customers yet</td></tr>';
     } else {
         tbody.innerHTML = Array.from(map.values()).map(c => `
             <tr>
                 <td><strong>${c.name}</strong></td>
                 <td>${c.email}</td>
                 <td>${c.phone}</td>
+                <td style="font-size:10px;max-width:100px;word-wrap:break-word;">${c.address}</td>
                 <td>${c.orders}</td>
                 <td>₹${c.total.toLocaleString()}</td>
                 <td>${c.joined}</td>
@@ -721,13 +727,14 @@ function sendWhatsApp(order) {
     
     const phone = WHATSAPP_CONFIG.adminNumber || '+919999999999';
     const itemsList = (order.items || []).map(i => 
-        `• ${i.brand} ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}`
+        `• ${i.brand} ${i.name} (${i.size||'M'}) × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}`
     ).join('\n');
     
     let msg = WHATSAPP_CONFIG.template
         .replace(/{orderId}/g, order.id)
         .replace(/{customer}/g, order.customerName || 'Guest')
         .replace(/{phone}/g, order.customerPhone || 'N/A')
+        .replace(/{address}/g, order.customerAddress || 'N/A')
         .replace(/{total}/g, (order.total || 0).toLocaleString())
         .replace(/{items}/g, itemsList)
         .replace(/{status}/g, order.status || 'Processing');
@@ -757,9 +764,10 @@ function testWhatsApp() {
         id: 'TEST' + Date.now().toString().slice(-6),
         customerName: 'Test Customer',
         customerPhone: '+919999999999',
+        customerAddress: '123, Test Street, Mumbai - 400001',
         total: 3999,
         status: 'processing',
-        items: [{ brand: 'Nike', name: 'Air Max', qty: 1, price: 3999 }]
+        items: [{ brand: 'Nike', name: 'Air Max', size: 'M', qty: 1, price: 3999 }]
     };
     sendWhatsApp(testOrder);
 }
@@ -833,8 +841,9 @@ function updateTemplatePreview() {
             .replace(/{orderId}/g, 'ORD12345678')
             .replace(/{customer}/g, 'John Doe')
             .replace(/{phone}/g, '+919999999999')
+            .replace(/{address}/g, '123, Test Street, Mumbai - 400001')
             .replace(/{total}/g, '3,999')
-            .replace(/{items}/g, '• Nike Air Max × 1 = ₹3,999')
+            .replace(/{items}/g, '• Nike Air Max (M) × 1 = ₹3,999')
             .replace(/{status}/g, 'Processing');
     }
 }
@@ -973,7 +982,6 @@ function init() {
         document.body.classList.add('dark-mode');
     }
     
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if(e.key === 'Escape') closeModal();
         if(e.ctrlKey && e.key === 'r') { e.preventDefault(); loadOrders(); }
@@ -1004,7 +1012,6 @@ window.saveWhatsAppSettings = saveWhatsAppSettings;
 window.sendTestMessage = sendTestMessage;
 window.saveAdminSettings = saveAdminSettings;
 
-// START
 init();
 </script>
 </body>
