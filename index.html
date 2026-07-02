@@ -238,7 +238,7 @@
                 <div class="table-scroll">
                     <table>
                         <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>WhatsApp</th><th>Date</th></tr></thead>
-                        <tbody id="recentOrders"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">Loading orders...</td></tr></tbody>
+                        <tbody id="recentOrders"><tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">Loading orders...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -261,7 +261,7 @@
                 <div class="table-scroll">
                     <table>
                         <thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Address</th><th>Items</th><th>Amount</th><th>Status</th><th>WhatsApp</th><th>Date</th><th>Action</th></tr></thead>
-                        <tbody id="ordersTable"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text3);">No orders found</td></tr></tbody>
+                        <tbody id="ordersTable"><tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">No orders found</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -316,7 +316,7 @@ Payment: COD
                 <div class="table-scroll">
                     <table>
                         <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Spent</th><th>Joined</th></tr></thead>
-                        <tbody id="customersTable"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No customers yet</td></tr></tbody>
+                        <tbody id="customersTable"><tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">No customers yet</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -360,9 +360,6 @@ const firebaseConfig = {
     appId: "1:742929086678:web:7fcd570695edf00946f177"
 };
 
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
 // ==========================================
 // ADMIN CREDENTIALS
 // ==========================================
@@ -404,52 +401,85 @@ Payment: COD
 };
 
 // ==========================================
-// LOGIN / LOGOUT
+// 🔥 LOGIN FUNCTION - FIXED
 // ==========================================
 function adminLogin() {
+    console.log('🔥 Login button clicked');
+    
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPassword').value;
+    
+    console.log('📧 Email:', email);
+    console.log('🔒 Password:', pass);
+    
     if(email === ADMIN.email && pass === ADMIN.password) {
+        console.log('✅ Login successful!');
+        
+        // Hide login, show admin panel
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
+        
+        // Save login state
         localStorage.setItem('admin_logged', 'true');
+        
+        // Load data
         loadOrders();
         startFirebaseListener();
         loadWhatsAppSettings();
+        
         toast('✅ Welcome Admin!');
     } else {
+        console.log('❌ Invalid credentials');
         toast('❌ Invalid credentials!');
     }
 }
 
+// ==========================================
+// LOGOUT
+// ==========================================
 function adminLogout() {
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('adminPanel').style.display = 'none';
     localStorage.removeItem('admin_logged');
-    if(window._firebaseListener) { database.ref('orders').off(); }
+    if(window._firebaseListener) { 
+        database.ref('orders').off(); 
+    }
     toast('👋 Logged out');
 }
 
 // ==========================================
-// 🔥 LOAD ORDERS FROM FIREBASE
+// 🔥 FIREBASE INIT
+// ==========================================
+let database = null;
+try {
+    firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    console.log('✅ Firebase Initialized');
+} catch(e) {
+    console.log('⚠️ Firebase already initialized or error:', e);
+    try {
+        database = firebase.database();
+    } catch(err) {
+        console.log('❌ Firebase database error:', err);
+    }
+}
+
+// ==========================================
+// 🔥 LOAD ORDERS
 // ==========================================
 function loadOrders() {
-    document.getElementById('lastUpdate')?.textContent = '📡 Loading...';
-
+    console.log('📦 Loading orders...');
+    
+    if(!database) {
+        console.log('⚠️ Firebase not ready, using localStorage');
+        loadLocalOrders();
+        return;
+    }
+    
     // Try localStorage first
-    try {
-        const local = localStorage.getItem('jmd_orders');
-        if(local) {
-            orders = JSON.parse(local);
-            renderOrders();
-            updateStats();
-            updateBadges();
-            updateCustomers();
-            console.log('✅ Loaded from localStorage:', orders.length);
-        }
-    } catch(e) {}
-
-    // Firebase live
+    loadLocalOrders();
+    
+    // Firebase
     database.ref('orders').once('value').then(snapshot => {
         const fbOrders = [];
         snapshot.forEach(child => {
@@ -466,7 +496,6 @@ function loadOrders() {
         updateStats();
         updateBadges();
         updateCustomers();
-        document.getElementById('lastUpdate')?.textContent = '✅ ' + new Date().toLocaleTimeString();
         toast('✅ Orders updated!');
     }).catch(err => {
         console.error('❌ Firebase error:', err);
@@ -474,11 +503,27 @@ function loadOrders() {
     });
 }
 
+function loadLocalOrders() {
+    try {
+        const local = localStorage.getItem('jmd_orders');
+        if(local) {
+            orders = JSON.parse(local);
+            renderOrders();
+            updateStats();
+            updateBadges();
+            updateCustomers();
+            console.log('✅ Loaded from localStorage:', orders.length);
+        }
+    } catch(e) {
+        console.log('⚠️ No local orders');
+    }
+}
+
 // ==========================================
-// 🔥 FIREBASE LISTENER - LIVE UPDATES
+// 🔥 FIREBASE LISTENER
 // ==========================================
 function startFirebaseListener() {
-    if(window._firebaseListener) return;
+    if(window._firebaseListener || !database) return;
     
     database.ref('orders').on('value', snapshot => {
         const fbOrders = [];
@@ -492,7 +537,6 @@ function startFirebaseListener() {
             updateStats();
             updateBadges();
             updateCustomers();
-            document.getElementById('lastUpdate')?.textContent = '🔥 ' + new Date().toLocaleTimeString();
             console.log('🔥 Live update from Firebase:', orders.length);
         }
     });
@@ -522,7 +566,7 @@ function renderOrders() {
     const tbody = document.getElementById('ordersTable');
     if(tbody) {
         if(!filtered || filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text3);">📦 No orders found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">📦 No orders found</td></tr>';
         } else {
             tbody.innerHTML = filtered.map(o => `
                 <tr>
@@ -557,7 +601,7 @@ function renderOrders() {
     if(recentTbody) {
         const recent = orders.slice(0, 5);
         if(recent.length === 0) {
-            recentTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No orders yet</td></tr>';
+            recentTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">No orders yet</td></tr>';
         } else {
             recentTbody.innerHTML = recent.map(o => `
                 <tr>
@@ -585,7 +629,9 @@ function updateStatus(orderId, status) {
     
     order.status = status;
     localStorage.setItem('jmd_orders', JSON.stringify(orders));
-    database.ref('orders/' + orderId).update({ status: status }).catch(()=>{});
+    if(database) {
+        database.ref('orders/' + orderId).update({ status: status }).catch(()=>{});
+    }
     
     renderOrders();
     updateStats();
@@ -630,7 +676,9 @@ function viewOrder(orderId) {
 function deleteOrder(orderId) {
     if(!confirm('Delete order ' + orderId + '?')) return;
     
-    database.ref('orders/' + orderId).remove().catch(()=>{});
+    if(database) {
+        database.ref('orders/' + orderId).remove().catch(()=>{});
+    }
     orders = orders.filter(o => o.id !== orderId);
     localStorage.setItem('jmd_orders', JSON.stringify(orders));
     renderOrders();
@@ -703,7 +751,7 @@ function updateCustomers() {
     });
     
     if(map.size === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No customers yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">No customers yet</td></tr>';
     } else {
         tbody.innerHTML = Array.from(map.values()).map(c => `
             <tr>
@@ -747,7 +795,9 @@ function sendWhatsApp(order) {
     updateWhatsAppLogs();
     
     order.whatsappSent = true;
-    database.ref('orders/' + order.id).update({ whatsappSent: true }).catch(()=>{});
+    if(database) {
+        database.ref('orders/' + order.id).update({ whatsappSent: true }).catch(()=>{});
+    }
     localStorage.setItem('jmd_orders', JSON.stringify(orders));
     document.getElementById('statWhatsApp').textContent = whatsappLogs.length;
     toast('💬 WhatsApp sent!');
@@ -862,7 +912,7 @@ function updateWhatsAppLogs() {
     if(!container) return;
     
     if(whatsappLogs.length === 0) {
-        container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:10px;">No messages sent yet</div>';
+        container.innerHTML = '<div style="color:#999;text-align:center;padding:10px;">No messages sent yet</div>';
         return;
     }
     
@@ -967,30 +1017,42 @@ function saveAdminSettings() {
 }
 
 // ==========================================
-// INIT
+// 🔥 AUTO LOGIN CHECK
 // ==========================================
-function init() {
+function checkAutoLogin() {
     if(localStorage.getItem('admin_logged') === 'true') {
+        console.log('🔐 Auto login enabled');
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadOrders();
         startFirebaseListener();
         loadWhatsAppSettings();
     }
-    
-    if(localStorage.getItem('admin_darkmode') === 'true') {
-        document.body.classList.add('dark-mode');
-    }
-    
-    document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape') closeModal();
-        if(e.ctrlKey && e.key === 'r') { e.preventDefault(); loadOrders(); }
-    });
-    
-    console.log('🔥 JMD Admin Panel v2.0 Loaded!');
 }
 
-// Expose globally
+// ==========================================
+// KEYBOARD SHORTCUTS
+// ==========================================
+document.addEventListener('keydown', function(e) {
+    if(e.key === 'Escape') closeModal();
+    if(e.ctrlKey && e.key === 'r') { e.preventDefault(); loadOrders(); }
+});
+
+// ==========================================
+// 🔥 INIT
+// ==========================================
+console.log('🔥 Admin Panel Loading...');
+console.log('👤 Login: jk / 1234');
+
+// Check auto login
+checkAutoLogin();
+
+// Dark mode
+if(localStorage.getItem('admin_darkmode') === 'true') {
+    document.body.classList.add('dark-mode');
+}
+
+// Expose functions globally
 window.loadOrders = loadOrders;
 window.updateStatus = updateStatus;
 window.deleteOrder = deleteOrder;
@@ -1012,7 +1074,7 @@ window.saveWhatsAppSettings = saveWhatsAppSettings;
 window.sendTestMessage = sendTestMessage;
 window.saveAdminSettings = saveAdminSettings;
 
-init();
+console.log('✅ Admin Panel Loaded Successfully!');
 </script>
 </body>
 </html>
